@@ -11,7 +11,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import space.delusive.discord.racoonsuperbot.discord.DiscordManager;
 import space.delusive.discord.racoonsuperbot.discord.impl.DiscordManagerImpl;
+import space.delusive.discord.racoonsuperbot.repository.TwitchStreamRepository;
 import space.delusive.discord.racoonsuperbot.repository.YoutubeVideoRepository;
+import space.delusive.discord.racoonsuperbot.repository.impl.TwitchStreamRepositoryImpl;
 import space.delusive.discord.racoonsuperbot.repository.impl.YoutubeVideoRepositoryImpl;
 
 @Configuration
@@ -32,6 +34,13 @@ public class ApplicationConfiguration {
             @Value("${youtube.api.token}") String apiToken,
             @Value("${youtube.api.search.url}") String url) {
         return new YoutubeVideoRepositoryImpl(url, apiToken);
+    }
+
+    @Bean
+    TwitchStreamRepository getTwitchStreamRepository(
+            @Value("${twitch.api.client.id}") String clientId,
+            @Value("${twitch.api.streams.url}") String url) {
+        return new TwitchStreamRepositoryImpl(url, clientId);
     }
 
     @Bean
