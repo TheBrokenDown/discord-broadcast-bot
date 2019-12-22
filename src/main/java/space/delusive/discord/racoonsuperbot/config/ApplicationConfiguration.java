@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import space.delusive.discord.racoonsuperbot.repository.YoutubeVideoRepository;
 import space.delusive.discord.racoonsuperbot.repository.impl.YoutubeVideoRepositoryImpl;
@@ -15,12 +14,13 @@ import space.delusive.discord.racoonsuperbot.repository.impl.YoutubeVideoReposit
 @Configuration
 @ComponentScan
 @EnableScheduling
-@PropertySource("classpath:application.properties")
 public class ApplicationConfiguration {
 
     @Bean
-    YoutubeVideoRepository getYoutubeVideoRepository(@Value("${youtube.api.token}") String apiToken) {
-        return new YoutubeVideoRepositoryImpl(apiToken);
+    YoutubeVideoRepository getYoutubeVideoRepository(
+            @Value("${youtube.api.token}") String apiToken,
+            @Value("${youtube.api.search.url}") String url) {
+        return new YoutubeVideoRepositoryImpl(url, apiToken);
     }
 
     @Bean

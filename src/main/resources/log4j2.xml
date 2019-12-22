@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration status="INFO">
+  <Properties>
+    <property name="console_pattern">%d [%p] %c{1} – %m%n</property>
+    <property name="file_pattern">%sn %d{yyyy-MM-dd HH:mm:ss,SSS} %r [%-6p] [%t] %c{3} %C{3}.%M(%F:%L) – %m%n</property>
+    <property name="logs_folder">logs</property>
+  </Properties>
+
+  <Appenders>
+    <Console name="console" target="SYSTEM_OUT">
+      <PatternLayout pattern="${console_pattern}"/>
+    </Console>
+    <File name="file1" fileName="${logs_folder}/application.log">
+      <PatternLayout pattern="${file_pattern}"/>
+    </File>
+  </Appenders>
+
+  <Loggers>
+    <Root level="debug">
+      <Appender-ref ref="console" level="info"/>
+      <Appender-ref ref="file1" level="debug"/>
+    </Root>
+    <Logger name="org.springframework" level="debug">
+      <Appender-ref ref="console" level="debug"/>
+      <Appender-ref ref="file1" level="debug"/>
+    </Logger>
+  </Loggers>
+</Configuration>

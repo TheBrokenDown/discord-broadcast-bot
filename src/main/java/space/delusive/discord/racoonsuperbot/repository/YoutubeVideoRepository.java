@@ -1,5 +1,7 @@
 package space.delusive.discord.racoonsuperbot.repository;
 
+import space.delusive.discord.racoonsuperbot.repository.dto.YoutubeVideoDto;
+
 public interface YoutubeVideoRepository {
-    String getIdOfLastUploadedVideo(String channelId);
+    YoutubeVideoDto getLastUploadedVideo(String channelId);
 }
