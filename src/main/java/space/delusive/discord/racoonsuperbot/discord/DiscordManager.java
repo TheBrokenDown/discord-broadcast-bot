@@ -1,5 +1,8 @@
 package space.delusive.discord.racoonsuperbot.discord;
 
+import space.delusive.discord.racoonsuperbot.domain.YoutubeChannel;
+import space.delusive.discord.racoonsuperbot.domain.YoutubeVideo;
+
 public interface DiscordManager {
-    // TODO: 12/22/2019
+    void informAboutNewVideoOnYoutube(YoutubeChannel youtubeChannel, YoutubeVideo youtubeVideo);
 }

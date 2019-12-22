@@ -3,11 +3,14 @@ package space.delusive.discord.racoonsuperbot.config;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import space.delusive.discord.racoonsuperbot.discord.DiscordManager;
+import space.delusive.discord.racoonsuperbot.discord.impl.DiscordManagerImpl;
 import space.delusive.discord.racoonsuperbot.repository.YoutubeVideoRepository;
 import space.delusive.discord.racoonsuperbot.repository.impl.YoutubeVideoRepositoryImpl;
 
@@ -15,6 +18,14 @@ import space.delusive.discord.racoonsuperbot.repository.impl.YoutubeVideoReposit
 @ComponentScan
 @EnableScheduling
 public class ApplicationConfiguration {
+
+    @Bean
+    DiscordManager getDiscordManager(
+            @Value("${discord.message.pattern.youtube.video}") String youtubeVideoMessagePattern,
+            @Value("${discord.channel.id}") String messageChannelId,
+            @Autowired JDA jda) {
+        return new DiscordManagerImpl(youtubeVideoMessagePattern, messageChannelId, jda);
+    }
 
     @Bean
     YoutubeVideoRepository getYoutubeVideoRepository(
