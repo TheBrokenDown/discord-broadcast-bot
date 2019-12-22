@@ -21,4 +21,7 @@ public class TwitchStream {
 
     @NonNull
     private String twitchId;
+
+    @NonNull
+    private String title;
 }

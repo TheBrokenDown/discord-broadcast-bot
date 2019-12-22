@@ -24,9 +24,10 @@ public class ApplicationConfiguration {
     @Bean
     DiscordManager getDiscordManager(
             @Value("${discord.message.pattern.youtube.video}") String youtubeVideoMessagePattern,
+            @Value("${discord.message.pattern.twitch.stream}") String twitchStreamMessagePattern,
             @Value("${discord.channel.id}") String messageChannelId,
             @Autowired JDA jda) {
-        return new DiscordManagerImpl(youtubeVideoMessagePattern, messageChannelId, jda);
+        return new DiscordManagerImpl(youtubeVideoMessagePattern, twitchStreamMessagePattern, messageChannelId, jda);
     }
 
     @Bean
