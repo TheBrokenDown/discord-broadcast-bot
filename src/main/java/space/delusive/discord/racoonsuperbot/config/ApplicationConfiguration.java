@@ -11,8 +11,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import space.delusive.discord.racoonsuperbot.discord.DiscordManager;
 import space.delusive.discord.racoonsuperbot.discord.impl.DiscordManagerImpl;
+import space.delusive.discord.racoonsuperbot.repository.MixerStreamRepository;
 import space.delusive.discord.racoonsuperbot.repository.TwitchStreamRepository;
 import space.delusive.discord.racoonsuperbot.repository.YoutubeVideoRepository;
+import space.delusive.discord.racoonsuperbot.repository.impl.MixerStreamRepositoryImpl;
 import space.delusive.discord.racoonsuperbot.repository.impl.TwitchStreamRepositoryImpl;
 import space.delusive.discord.racoonsuperbot.repository.impl.YoutubeVideoRepositoryImpl;
 
@@ -25,9 +27,10 @@ public class ApplicationConfiguration {
     DiscordManager getDiscordManager(
             @Value("${discord.message.pattern.youtube.video}") String youtubeVideoMessagePattern,
             @Value("${discord.message.pattern.twitch.stream}") String twitchStreamMessagePattern,
+            @Value("${discord.message.pattern.mixer.stream}") String mixerStreamMessagePattern,
             @Value("${discord.channel.id}") String messageChannelId,
             @Autowired JDA jda) {
-        return new DiscordManagerImpl(youtubeVideoMessagePattern, twitchStreamMessagePattern, messageChannelId, jda);
+        return new DiscordManagerImpl(youtubeVideoMessagePattern, twitchStreamMessagePattern, mixerStreamMessagePattern, messageChannelId, jda);
     }
 
     @Bean
@@ -43,6 +46,11 @@ public class ApplicationConfiguration {
             @Value("${twitch.api.client.id}") String clientId,
             @Value("${twitch.api.streams.url}") String url) {
         return new TwitchStreamRepositoryImpl(url, clientId);
+    }
+
+    @Bean
+    MixerStreamRepository getMixerStreamRepository(@Value("${mixer.api.last.stream.url}") String lastStreamUrl) {
+        return new MixerStreamRepositoryImpl(lastStreamUrl);
     }
 
     @Bean

@@ -7,10 +7,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import space.delusive.discord.racoonsuperbot.discord.DiscordManager;
-import space.delusive.discord.racoonsuperbot.domain.TwitchChannel;
-import space.delusive.discord.racoonsuperbot.domain.TwitchStream;
-import space.delusive.discord.racoonsuperbot.domain.YoutubeChannel;
-import space.delusive.discord.racoonsuperbot.domain.YoutubeVideo;
+import space.delusive.discord.racoonsuperbot.domain.*;
 
 import java.util.Optional;
 
@@ -19,8 +16,10 @@ import java.util.Optional;
 public class DiscordManagerImpl implements DiscordManager {
     private static final String youtubeVideoBaseLink = "https://youtu.be/";
     private static final String twitchStreamBaseLink = "https://twitch.tv/";
+    private static final String mixerStreamBaseLink = "https://mixer.com/";
     private final String youtubeVideoMessagePattern;
     private final String twitchStreamMessagePattern;
+    private final String mixerStreamMessagePattern;
     private final String messageChannelId;
     private final JDA jda;
 
@@ -46,6 +45,18 @@ public class DiscordManagerImpl implements DiscordManager {
                 .replaceAll("\\{channelName\\}", twitchChannel.getChannelName())
                 .replaceAll("\\{streamTitle\\}", twitchStream.getTitle())
                 .replaceAll("\\{streamLink\\}", twitchStreamBaseLink + twitchChannel.getChannelName());
+        optionalTextChannel.get().sendMessage(message).queue();
+    }
+
+    @Override
+    public void informAboutBeginningOfStreamOnMixer(MixerChannel mixerChannel, MixerStream mixerStream) {
+        val optionalTextChannel = getChannelIfGood();
+        val optionalRole = getRoleIfGood(mixerChannel.getMentionRoleId());
+        if (optionalTextChannel.isEmpty() || optionalRole.isEmpty()) return;
+        val message = mixerStreamMessagePattern
+                .replaceAll("\\{mention\\}", optionalRole.get().getAsMention())
+                .replaceAll("\\{channelName\\}", mixerChannel.getChannelName())
+                .replaceAll("\\{streamLink\\}", mixerStreamBaseLink + mixerChannel.getChannelName());
         optionalTextChannel.get().sendMessage(message).queue();
     }
 

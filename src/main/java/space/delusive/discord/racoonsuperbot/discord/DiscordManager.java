@@ -1,12 +1,11 @@
 package space.delusive.discord.racoonsuperbot.discord;
 
-import space.delusive.discord.racoonsuperbot.domain.TwitchChannel;
-import space.delusive.discord.racoonsuperbot.domain.TwitchStream;
-import space.delusive.discord.racoonsuperbot.domain.YoutubeChannel;
-import space.delusive.discord.racoonsuperbot.domain.YoutubeVideo;
+import space.delusive.discord.racoonsuperbot.domain.*;
 
 public interface DiscordManager {
     void informAboutNewVideoOnYoutube(YoutubeChannel youtubeChannel, YoutubeVideo youtubeVideo);
 
     void informAboutBeginningOfStreamOnTwitch(TwitchChannel twitchChannel, TwitchStream twitchStream);
+
+    void informAboutBeginningOfStreamOnMixer(MixerChannel mixerChannel, MixerStream mixerStream);
 }
