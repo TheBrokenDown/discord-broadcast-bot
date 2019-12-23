@@ -8,5 +8,5 @@ import space.delusive.discord.racoonsuperbot.domain.YoutubeVideo;
 public interface DiscordManager {
     void informAboutNewVideoOnYoutube(YoutubeChannel youtubeChannel, YoutubeVideo youtubeVideo);
 
-    void informAboutBeginningOfStream(TwitchChannel twitchChannel, TwitchStream twitchStream);
+    void informAboutBeginningOfStreamOnTwitch(TwitchChannel twitchChannel, TwitchStream twitchStream);
 }

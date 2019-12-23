@@ -37,7 +37,7 @@ public class DiscordManagerImpl implements DiscordManager {
     }
 
     @Override
-    public void informAboutBeginningOfStream(TwitchChannel twitchChannel, TwitchStream twitchStream) {
+    public void informAboutBeginningOfStreamOnTwitch(TwitchChannel twitchChannel, TwitchStream twitchStream) {
         val optionalTextChannel = getChannelIfGood();
         val optionalRole = getRoleIfGood(twitchChannel.getMentionRoleId());
         if (optionalTextChannel.isEmpty() || optionalRole.isEmpty()) return;

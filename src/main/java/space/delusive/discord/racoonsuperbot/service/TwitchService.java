@@ -28,7 +28,7 @@ public class TwitchService {
         channels.forEach(twitchChannel -> {
             val currentStreamIfNew = getCurrentStreamIfNew(twitchChannel.getChannelName());
             currentStreamIfNew.ifPresent(twitchStream -> {
-                discordManager.informAboutBeginningOfStream(twitchChannel, twitchStream);
+                discordManager.informAboutBeginningOfStreamOnTwitch(twitchChannel, twitchStream);
             });
         });
     }
