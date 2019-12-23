@@ -26,10 +26,10 @@ public class DiscordManagerImpl implements DiscordManager {
     @Override
     public void informAboutNewVideoOnYoutube(YoutubeChannel youtubeChannel, YoutubeVideo youtubeVideo) {
         val optionalTextChannel = getChannelIfGood();
-        val optionalRole = getRoleIfGood(youtubeChannel.getMentionRoleId());
-        if (optionalTextChannel.isEmpty() || optionalRole.isEmpty()) return;
+        val optionalRoleAsMention = getRoleAsMentionIfGood(youtubeChannel.getMentionRoleId());
+        if (optionalTextChannel.isEmpty() || optionalRoleAsMention.isEmpty()) return;
         val message = youtubeVideoMessagePattern
-                .replaceAll("\\{mention\\}", optionalRole.get().getAsMention())
+                .replaceAll("\\{mention\\}", optionalRoleAsMention.get())
                 .replaceAll("\\{channelTitle\\}", youtubeChannel.getChannelName())
                 .replaceAll("\\{videoLink\\}", youtubeVideoBaseLink + youtubeVideo.getYoutubeId());
         optionalTextChannel.get().sendMessage(message).queue();
@@ -38,10 +38,10 @@ public class DiscordManagerImpl implements DiscordManager {
     @Override
     public void informAboutBeginningOfStreamOnTwitch(TwitchChannel twitchChannel, TwitchStream twitchStream) {
         val optionalTextChannel = getChannelIfGood();
-        val optionalRole = getRoleIfGood(twitchChannel.getMentionRoleId());
-        if (optionalTextChannel.isEmpty() || optionalRole.isEmpty()) return;
+        val optionalRoleAsMention = getRoleAsMentionIfGood(twitchChannel.getMentionRoleId());
+        if (optionalTextChannel.isEmpty() || optionalRoleAsMention.isEmpty()) return;
         val message = twitchStreamMessagePattern
-                .replaceAll("\\{mention\\}", optionalRole.get().getAsMention())
+                .replaceAll("\\{mention\\}", optionalRoleAsMention.get())
                 .replaceAll("\\{channelName\\}", twitchChannel.getChannelName())
                 .replaceAll("\\{streamTitle\\}", twitchStream.getTitle())
                 .replaceAll("\\{streamLink\\}", twitchStreamBaseLink + twitchChannel.getChannelName());
@@ -51,10 +51,10 @@ public class DiscordManagerImpl implements DiscordManager {
     @Override
     public void informAboutBeginningOfStreamOnMixer(MixerChannel mixerChannel, MixerStream mixerStream) {
         val optionalTextChannel = getChannelIfGood();
-        val optionalRole = getRoleIfGood(mixerChannel.getMentionRoleId());
-        if (optionalTextChannel.isEmpty() || optionalRole.isEmpty()) return;
+        val optionalRoleAsMention = getRoleAsMentionIfGood(mixerChannel.getMentionRoleId());
+        if (optionalTextChannel.isEmpty() || optionalRoleAsMention.isEmpty()) return;
         val message = mixerStreamMessagePattern
-                .replaceAll("\\{mention\\}", optionalRole.get().getAsMention())
+                .replaceAll("\\{mention\\}", optionalRoleAsMention.get())
                 .replaceAll("\\{channelName\\}", mixerChannel.getChannelName())
                 .replaceAll("\\{streamLink\\}", mixerStreamBaseLink + mixerChannel.getChannelName());
         optionalTextChannel.get().sendMessage(message).queue();
@@ -69,13 +69,15 @@ public class DiscordManagerImpl implements DiscordManager {
         return Optional.of(textChannel);
     }
 
-    private Optional<Role> getRoleIfGood(String roleId) {
+    private Optional<String> getRoleAsMentionIfGood(String roleId) {
+        if (roleId.equalsIgnoreCase("everyone")) return Optional.of("@everyone");
+        if (roleId.equalsIgnoreCase("noone")) return Optional.of("");
         Role mentionRole = jda.getRoleById(roleId);
         if (mentionRole == null || isNotMentionable(mentionRole)) {
             log.error("No mention role found or that role is not mentionable. ID: " + roleId);
             return Optional.empty();
         }
-        return Optional.of(mentionRole);
+        return Optional.of(mentionRole.getAsMention());
     }
 
     private boolean canNotTalkTo(TextChannel textChannel) {
