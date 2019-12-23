@@ -17,8 +17,8 @@ class YoutubeIntegrationTests {
 
     @Test
     @DisplayName("Get some video from youtube")
-    public void getYoutubeVideoFromWebService(@Value("UCQ5zOV00L1ESumw4qJADULA") String channelId) {
-        YoutubeVideoDto youtubeVideo = youtubeVideoRepository.getLastUploadedVideo(channelId);
+    public void getYoutubeVideoFromWebService(@Value("UUQ5zOV00L1ESumw4qJADULA") String playlistId) {
+        YoutubeVideoDto youtubeVideo = youtubeVideoRepository.getLastUploadedVideoByPlaylistId(playlistId);
         assertFalse(youtubeVideo.getChannelTitle().isBlank());
     }
 

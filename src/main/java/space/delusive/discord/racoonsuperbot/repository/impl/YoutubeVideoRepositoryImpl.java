@@ -16,29 +16,58 @@ import java.time.LocalDateTime;
 @Log4j2
 @AllArgsConstructor
 public class YoutubeVideoRepositoryImpl implements YoutubeVideoRepository {
-    private final String url;
+    private final String searchVideosByChannelIdUrl;
+    private final String getVideosFromPlaylistUrl;
     private final String apiToken;
 
     @Override
-    public YoutubeVideoDto getLastUploadedVideo(String channelId) throws UnsuccessfulRequestException {
-        HttpResponse<JsonNode> response = Unirest.get(url)
+    public YoutubeVideoDto getLastUploadedVideoByChannelId(String channelId) throws UnsuccessfulRequestException {
+        HttpResponse<JsonNode> response = Unirest.get(searchVideosByChannelIdUrl)
                 .routeParam("channelId", channelId)
                 .routeParam("apiToken", apiToken)
                 .asJson();
+        checkResponseForSuccess(response);
+        val jsonObject = (JSONObject) response.getBody().getObject().getJSONArray("items").get(0); // TODO: 12/22/2019 review case if there is no videos available
+        return extractVideoDtoFromJsonObjectByChannelId(jsonObject);
+    }
+
+    @Override
+    public YoutubeVideoDto getLastUploadedVideoByPlaylistId(String playlistId) {
+        HttpResponse<JsonNode> response = Unirest.get(getVideosFromPlaylistUrl)
+                .routeParam("playlistId", playlistId)
+                .routeParam("apiToken", apiToken)
+                .asJson();
+        checkResponseForSuccess(response);
+        val jsonObject = (JSONObject) response.getBody().getObject().getJSONArray("items").get(0); // TODO: 12/23/2019 here too :p
+        return extractVideoDtoFromJsonObjectByPlaylistId(jsonObject);
+    }
+
+    private YoutubeVideoDto extractVideoDtoFromJsonObjectByChannelId(JSONObject jsonObject) {
+        val videoId = jsonObject.getJSONObject("id").getString("videoId");
+        val snippet = jsonObject.getJSONObject("snippet");
+        return generateDtoFromSnippetAndId(videoId, snippet);
+    }
+
+    private YoutubeVideoDto extractVideoDtoFromJsonObjectByPlaylistId(JSONObject jsonObject) {
+        val snippet = jsonObject.getJSONObject("snippet");
+        val videoId = snippet.getJSONObject("resourceId").getString("videoId");
+        return generateDtoFromSnippetAndId(videoId, snippet);
+    }
+
+    private YoutubeVideoDto generateDtoFromSnippetAndId(String id, JSONObject snippet) {
+        val publishTime = LocalDateTime.parse(snippet.getString("publishedAt").replaceFirst(".$", ""));
+        val title = snippet.getString("title");
+        val description = snippet.getString("description");
+        val channelTitle = snippet.getString("channelTitle");
+        return new YoutubeVideoDto(publishTime, title, description, id, channelTitle);
+    }
+
+    private void checkResponseForSuccess(HttpResponse<JsonNode> response) throws UnsuccessfulRequestException {
         if (isNotSuccess(response)) {
             throw new UnsuccessfulRequestException(
                     String.format("Response status code is not success. The code is %s and the body is %s",
                             response.getStatus(), response.getBody().toPrettyString()));
         }
-        val jsonObject = (JSONObject) response.getBody().getObject().getJSONArray("items").get(0); // TODO: 12/22/2019 review case if there is no videos available
-        val snippet = jsonObject.getJSONObject("snippet");
-
-        val videoId = jsonObject.getJSONObject("id").getString("videoId");
-        val publishTime = LocalDateTime.parse(snippet.getString("publishedAt").replaceFirst(".$", ""));
-        val title = snippet.getString("title");
-        val description = snippet.getString("description");
-        val channelTitle = snippet.getString("channelTitle");
-        return new YoutubeVideoDto(publishTime, title, description, videoId, channelTitle);
     }
 
     private boolean isNotSuccess(HttpResponse response) {

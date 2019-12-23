@@ -25,4 +25,7 @@ public class YoutubeChannel {
 
     @NonNull
     private String mentionRoleId;
+
+    @NonNull
+    private String uploadsPlaylistId;
 }

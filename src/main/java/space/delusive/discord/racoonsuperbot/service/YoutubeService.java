@@ -21,19 +21,19 @@ public class YoutubeService {
     private final YoutubeVideoRepository youtubeVideoRepository;
     private final DiscordManager discordManager;
 
-    @Scheduled(fixedDelay = 10000) // run every 5 seconds
+    @Scheduled(fixedDelay = 30000) // run every 30 seconds
     public void run() {
         Iterable<YoutubeChannel> channels = youtubeChannelDao.findAll();
         channels.forEach(youtubeChannel -> {
-            Optional<YoutubeVideo> newVideo = getNewVideo(youtubeChannel.getChannelId());
+            Optional<YoutubeVideo> newVideo = getNewVideo(youtubeChannel.getUploadsPlaylistId());
             newVideo.ifPresent(youtubeVideo -> {
                 discordManager.informAboutNewVideoOnYoutube(youtubeChannel, youtubeVideo);
             });
         });
     }
 
-    private Optional<YoutubeVideo> getNewVideo(String channelId) {
-        YoutubeVideoDto lastUploadedVideo = youtubeVideoRepository.getLastUploadedVideo(channelId);
+    private Optional<YoutubeVideo> getNewVideo(String playlistId) {
+        YoutubeVideoDto lastUploadedVideo = youtubeVideoRepository.getLastUploadedVideoByPlaylistId(playlistId);
         YoutubeVideo videoFromDb = youtubeVideoDao.getByYoutubeId(lastUploadedVideo.getVideoId());
         if (videoFromDb == null) { //we don't know about last uploaded video so it is new
             YoutubeVideo youtubeVideo = new YoutubeVideo(lastUploadedVideo.getVideoId());

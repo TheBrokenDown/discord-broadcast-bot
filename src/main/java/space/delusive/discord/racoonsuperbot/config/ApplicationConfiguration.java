@@ -33,8 +33,9 @@ public class ApplicationConfiguration {
     @Bean
     YoutubeVideoRepository getYoutubeVideoRepository(
             @Value("${youtube.api.token}") String apiToken,
-            @Value("${youtube.api.search.url}") String url) {
-        return new YoutubeVideoRepositoryImpl(url, apiToken);
+            @Value("${youtube.api.search.url}") String searchUrl,
+            @Value("${youtube.api.videos.from.playlist.url}") String videosFromPlaylistUrl) {
+        return new YoutubeVideoRepositoryImpl(searchUrl, videosFromPlaylistUrl, apiToken);
     }
 
     @Bean
