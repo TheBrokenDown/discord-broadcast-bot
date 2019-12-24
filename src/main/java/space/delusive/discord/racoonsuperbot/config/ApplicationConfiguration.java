@@ -3,6 +3,7 @@ package space.delusive.discord.racoonsuperbot.config;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -55,8 +56,11 @@ public class ApplicationConfiguration {
 
     @Bean
     @SneakyThrows
-    JDA getJda(@Value("${discord.bot.token}") String botToken) {
-        return new JDABuilder(botToken).build();
+    JDA getJda(@Value("${discord.bot.token}") String botToken,
+               @Value("${discord.bot.status}") String status) {
+        return new JDABuilder(botToken)
+                .setActivity(Activity.playing(status))
+                .build();
     }
 
 }

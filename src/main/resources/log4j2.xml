@@ -21,7 +21,7 @@
       <Appender-ref ref="file1" level="debug"/>
     </Root>
     <Logger name="org.springframework" level="debug">
-      <Appender-ref ref="console" level="debug"/>
+      <Appender-ref ref="console" level="info"/>
       <Appender-ref ref="file1" level="debug"/>
     </Logger>
   </Loggers>
