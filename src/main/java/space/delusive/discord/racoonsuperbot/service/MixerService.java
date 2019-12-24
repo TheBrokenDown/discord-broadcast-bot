@@ -1,6 +1,7 @@
 package space.delusive.discord.racoonsuperbot.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.val;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -8,12 +9,14 @@ import space.delusive.discord.racoonsuperbot.dao.MixerChannelDao;
 import space.delusive.discord.racoonsuperbot.dao.MixerStreamDao;
 import space.delusive.discord.racoonsuperbot.discord.DiscordManager;
 import space.delusive.discord.racoonsuperbot.domain.MixerStream;
+import space.delusive.discord.racoonsuperbot.exception.UnsuccessfulRequestException;
 import space.delusive.discord.racoonsuperbot.repository.MixerStreamRepository;
 import space.delusive.discord.racoonsuperbot.repository.dto.MixerStreamDto;
 
 import java.util.Optional;
 
 @Component
+@Log4j2
 @AllArgsConstructor
 public class MixerService {
     private final MixerStreamDao mixerStreamDao;
@@ -33,7 +36,13 @@ public class MixerService {
     }
 
     private Optional<MixerStream> getCurrentStreamIfNew(String channelId) {
-        MixerStreamDto currentStream = mixerStreamRepository.getCurrentStream(channelId);
+        MixerStreamDto currentStream;
+        try {
+            currentStream = mixerStreamRepository.getCurrentStream(channelId);
+        } catch (UnsuccessfulRequestException e) {
+            log.debug(e);
+            return Optional.empty();
+        }
         if (currentStream.isTestStream() || isNotOnline(currentStream)) {
             return Optional.empty();
         }
