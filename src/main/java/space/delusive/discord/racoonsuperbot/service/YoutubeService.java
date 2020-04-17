@@ -22,7 +22,7 @@ public class YoutubeService {
     private final YoutubeIntegration youtubeIntegration;
     private final DiscordManager discordManager;
 
-    @Scheduled(fixedDelay = 30000) // run every 30 seconds
+    @Scheduled(fixedDelay = 130000) // run every 130 seconds
     public void run() {
         Iterable<YoutubeChannel> channels = youtubeChannelRepository.findAll();
         channels.forEach(youtubeChannel -> {
