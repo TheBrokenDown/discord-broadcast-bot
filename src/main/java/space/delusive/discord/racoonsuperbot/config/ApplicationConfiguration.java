@@ -12,12 +12,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import space.delusive.discord.racoonsuperbot.discord.DiscordManager;
 import space.delusive.discord.racoonsuperbot.discord.impl.DiscordManagerImpl;
-import space.delusive.discord.racoonsuperbot.repository.MixerStreamRepository;
-import space.delusive.discord.racoonsuperbot.repository.TwitchStreamRepository;
-import space.delusive.discord.racoonsuperbot.repository.YoutubeVideoRepository;
-import space.delusive.discord.racoonsuperbot.repository.impl.MixerStreamRepositoryImpl;
-import space.delusive.discord.racoonsuperbot.repository.impl.TwitchStreamRepositoryImpl;
-import space.delusive.discord.racoonsuperbot.repository.impl.YoutubeVideoRepositoryImpl;
+import space.delusive.discord.racoonsuperbot.integration.MixerIntegration;
+import space.delusive.discord.racoonsuperbot.integration.TwitchIntegration;
+import space.delusive.discord.racoonsuperbot.integration.YoutubeIntegration;
+import space.delusive.discord.racoonsuperbot.integration.impl.MixerIntegrationImpl;
+import space.delusive.discord.racoonsuperbot.integration.impl.TwitchIntegrationImpl;
+import space.delusive.discord.racoonsuperbot.integration.impl.YoutubeIntegrationImpl;
 
 @Configuration
 @ComponentScan
@@ -31,27 +31,28 @@ public class ApplicationConfiguration {
             @Value("${discord.message.pattern.mixer.stream}") String mixerStreamMessagePattern,
             @Value("${discord.channel.id}") String messageChannelId,
             @Autowired JDA jda) {
-        return new DiscordManagerImpl(youtubeVideoMessagePattern, twitchStreamMessagePattern, mixerStreamMessagePattern, messageChannelId, jda);
+        return new DiscordManagerImpl(youtubeVideoMessagePattern, twitchStreamMessagePattern, mixerStreamMessagePattern,
+                messageChannelId, jda);
     }
 
     @Bean
-    YoutubeVideoRepository getYoutubeVideoRepository(
+    YoutubeIntegration getYoutubeVideoRepository(
             @Value("${youtube.api.token}") String apiToken,
             @Value("${youtube.api.search.url}") String searchUrl,
             @Value("${youtube.api.videos.from.playlist.url}") String videosFromPlaylistUrl) {
-        return new YoutubeVideoRepositoryImpl(searchUrl, videosFromPlaylistUrl, apiToken);
+        return new YoutubeIntegrationImpl(searchUrl, videosFromPlaylistUrl, apiToken);
     }
 
     @Bean
-    TwitchStreamRepository getTwitchStreamRepository(
+    TwitchIntegration getTwitchStreamRepository(
             @Value("${twitch.api.client.id}") String clientId,
             @Value("${twitch.api.streams.url}") String url) {
-        return new TwitchStreamRepositoryImpl(url, clientId);
+        return new TwitchIntegrationImpl(url, clientId);
     }
 
     @Bean
-    MixerStreamRepository getMixerStreamRepository(@Value("${mixer.api.last.stream.url}") String lastStreamUrl) {
-        return new MixerStreamRepositoryImpl(lastStreamUrl);
+    MixerIntegration getMixerStreamRepository(@Value("${mixer.api.last.stream.url}") String lastStreamUrl) {
+        return new MixerIntegrationImpl(lastStreamUrl);
     }
 
     @Bean

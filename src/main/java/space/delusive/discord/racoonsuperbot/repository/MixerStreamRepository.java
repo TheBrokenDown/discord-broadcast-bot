@@ -1,7 +1,10 @@
 package space.delusive.discord.racoonsuperbot.repository;
 
-import space.delusive.discord.racoonsuperbot.repository.dto.MixerStreamDto;
+import org.springframework.data.repository.CrudRepository;
+import space.delusive.discord.racoonsuperbot.domain.MixerStream;
 
-public interface MixerStreamRepository {
-    MixerStreamDto getCurrentStream(String channelId);
+import java.util.Optional;
+
+public interface MixerStreamRepository extends CrudRepository<MixerStream, Integer> {
+    Optional<MixerStream> getByMixerId(String mixerId);
 }

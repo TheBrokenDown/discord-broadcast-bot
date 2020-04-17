@@ -1,4 +1,4 @@
-package space.delusive.discord.racoonsuperbot.repository.impl;
+package space.delusive.discord.racoonsuperbot.integration.impl;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -7,11 +7,11 @@ import kong.unirest.json.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import space.delusive.discord.racoonsuperbot.exception.UnsuccessfulRequestException;
-import space.delusive.discord.racoonsuperbot.repository.MixerStreamRepository;
-import space.delusive.discord.racoonsuperbot.repository.dto.MixerStreamDto;
+import space.delusive.discord.racoonsuperbot.integration.MixerIntegration;
+import space.delusive.discord.racoonsuperbot.integration.dto.MixerStreamDto;
 
 @AllArgsConstructor
-public class MixerStreamRepositoryImpl implements MixerStreamRepository {
+public class MixerIntegrationImpl implements MixerIntegration {
     private final String lastStreamUrl;
 
     @Override

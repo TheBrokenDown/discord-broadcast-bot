@@ -1,7 +1,10 @@
 package space.delusive.discord.racoonsuperbot.repository;
 
-import space.delusive.discord.racoonsuperbot.repository.dto.TwitchStreamDto;
+import org.springframework.data.repository.CrudRepository;
+import space.delusive.discord.racoonsuperbot.domain.TwitchStream;
 
-public interface TwitchStreamRepository {
-    TwitchStreamDto getCurrentStream(String userName);
+import java.util.Optional;
+
+public interface TwitchStreamRepository extends CrudRepository<TwitchStream, Integer> {
+    Optional<TwitchStream> getByTwitchId(String twitchId);
 }

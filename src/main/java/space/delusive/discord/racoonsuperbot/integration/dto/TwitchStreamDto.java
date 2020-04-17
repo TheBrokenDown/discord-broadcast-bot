@@ -1,4 +1,4 @@
-package space.delusive.discord.racoonsuperbot.repository.dto;
+package space.delusive.discord.racoonsuperbot.integration.dto;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -8,11 +8,11 @@ import lombok.Value;
 @RequiredArgsConstructor
 public class TwitchStreamDto {
     @NonNull
-    private String streamId;
+    String streamId;
     @NonNull
-    private String userId;
+    String userId;
     @NonNull
-    private String userName;
+    String userName;
     @NonNull
-    private String title;
+    String title;
 }

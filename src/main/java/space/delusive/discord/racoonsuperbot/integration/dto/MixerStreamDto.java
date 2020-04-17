@@ -1,4 +1,4 @@
-package space.delusive.discord.racoonsuperbot.repository.dto;
+package space.delusive.discord.racoonsuperbot.integration.dto;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -8,11 +8,11 @@ import lombok.Value;
 @RequiredArgsConstructor
 public class MixerStreamDto {
     @NonNull
-    private String channelId;
+    String channelId;
     @NonNull
-    private boolean isTestStream;
+    boolean isTestStream;
     @NonNull
-    private boolean isOnline;
+    boolean isOnline;
     @NonNull
-    private String id;
+    String id;
 }

@@ -1,4 +1,4 @@
-package space.delusive.discord.racoonsuperbot.repository.impl;
+package space.delusive.discord.racoonsuperbot.integration.impl;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -8,14 +8,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import lombok.val;
 import space.delusive.discord.racoonsuperbot.exception.UnsuccessfulRequestException;
-import space.delusive.discord.racoonsuperbot.repository.YoutubeVideoRepository;
-import space.delusive.discord.racoonsuperbot.repository.dto.YoutubeVideoDto;
+import space.delusive.discord.racoonsuperbot.integration.YoutubeIntegration;
+import space.delusive.discord.racoonsuperbot.integration.dto.YoutubeVideoDto;
 
 import java.time.LocalDateTime;
 
 @Log4j2
 @AllArgsConstructor
-public class YoutubeVideoRepositoryImpl implements YoutubeVideoRepository {
+public class YoutubeIntegrationImpl implements YoutubeIntegration {
     private final String searchVideosByChannelIdUrl;
     private final String getVideosFromPlaylistUrl;
     private final String apiToken;

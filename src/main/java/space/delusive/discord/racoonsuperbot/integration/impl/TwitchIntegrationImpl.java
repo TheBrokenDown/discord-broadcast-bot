@@ -1,4 +1,4 @@
-package space.delusive.discord.racoonsuperbot.repository.impl;
+package space.delusive.discord.racoonsuperbot.integration.impl;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -9,11 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import space.delusive.discord.racoonsuperbot.exception.NoCurrentStreamFoundException;
 import space.delusive.discord.racoonsuperbot.exception.UnsuccessfulRequestException;
-import space.delusive.discord.racoonsuperbot.repository.TwitchStreamRepository;
-import space.delusive.discord.racoonsuperbot.repository.dto.TwitchStreamDto;
+import space.delusive.discord.racoonsuperbot.integration.TwitchIntegration;
+import space.delusive.discord.racoonsuperbot.integration.dto.TwitchStreamDto;
 
 @AllArgsConstructor
-public class TwitchStreamRepositoryImpl implements TwitchStreamRepository {
+public class TwitchIntegrationImpl implements TwitchIntegration {
     private final String url;
     private final String clientId;
 

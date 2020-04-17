@@ -1,10 +1,10 @@
 package space.delusive.discord.racoonsuperbot.repository;
 
-import space.delusive.discord.racoonsuperbot.repository.dto.YoutubeVideoDto;
+import org.springframework.data.repository.CrudRepository;
+import space.delusive.discord.racoonsuperbot.domain.YoutubeVideo;
 
-public interface YoutubeVideoRepository {
-    @Deprecated
-    YoutubeVideoDto getLastUploadedVideoByChannelId(String channelId);
+import java.util.Optional;
 
-    YoutubeVideoDto getLastUploadedVideoByPlaylistId(String playlistId);
+public interface YoutubeVideoRepository extends CrudRepository<YoutubeVideo, Integer> {
+    Optional<YoutubeVideo> getByYoutubeId(String youtubeId);
 }
