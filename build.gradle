@@ -29,7 +29,7 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
-    compile ('net.dv8tion:JDA:4.0.0_79') {
+    compile ('net.dv8tion:JDA:4.1.1_101') {
         exclude module: 'opus-java'
     }
     compile 'com.konghq:unirest-java:3.3.00'
