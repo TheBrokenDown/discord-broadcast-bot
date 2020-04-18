@@ -1,5 +1,8 @@
 package space.delusive.discord.broadcastbot.config;
 
+import com.jagrosh.jdautilities.command.Command;
+import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -18,6 +21,8 @@ import space.delusive.discord.broadcastbot.integration.YoutubeIntegration;
 import space.delusive.discord.broadcastbot.integration.impl.MixerIntegrationImpl;
 import space.delusive.discord.broadcastbot.integration.impl.TwitchIntegrationImpl;
 import space.delusive.discord.broadcastbot.integration.impl.YoutubeIntegrationImpl;
+
+import java.util.List;
 
 @Configuration
 @ComponentScan
@@ -58,9 +63,23 @@ public class ApplicationConfiguration {
     @Bean
     @SneakyThrows
     JDA getJda(@Value("${discord.bot.token}") String botToken,
-               @Value("${discord.bot.status}") String status) {
+               @Value("${discord.bot.status}") String status,
+               @Value("${discord.bot.prefix}") String botPrefix,
+               @Value("${discord.bot.emoji.success}") String emojiSuccess,
+               @Value("${discord.bot.emoji.warning}") String emojiWarning,
+               @Value("${discord.bot.emoji.error}") String emojiError,
+               @Value("${discord.bot.owner.id}") String ownerId,
+               List<Command> commandList) {
+        CommandClientBuilder commandClientBuilder = new CommandClientBuilder();
+        EventWaiter eventWaiter = new EventWaiter();
+        commandClientBuilder.useDefaultGame()
+                .setPrefix(botPrefix)
+                .setOwnerId(ownerId)
+                .setEmojis(emojiSuccess, emojiWarning, emojiError)
+                .addCommands(commandList.toArray(new Command[0]));
         return new JDABuilder(botToken)
                 .setActivity(Activity.playing(status))
+                .addEventListeners(commandClientBuilder.build(), eventWaiter)
                 .build();
     }
 
