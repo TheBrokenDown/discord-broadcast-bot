@@ -9,9 +9,11 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import space.delusive.discord.broadcastbot.discord.DiscordManager;
 import space.delusive.discord.broadcastbot.discord.impl.DiscordManagerImpl;
@@ -69,9 +71,9 @@ public class ApplicationConfiguration {
                @Value("${discord.bot.emoji.warning}") String emojiWarning,
                @Value("${discord.bot.emoji.error}") String emojiError,
                @Value("${discord.bot.owner.id}") String ownerId,
-               List<Command> commandList) {
+               List<Command> commandList,
+               EventWaiter eventWaiter) {
         CommandClientBuilder commandClientBuilder = new CommandClientBuilder();
-        EventWaiter eventWaiter = new EventWaiter();
         commandClientBuilder.useDefaultGame()
                 .setPrefix(botPrefix)
                 .setOwnerId(ownerId)
@@ -83,4 +85,15 @@ public class ApplicationConfiguration {
                 .build();
     }
 
+    @Bean
+    public EventWaiter eventWaiter() {
+        return new EventWaiter();
+    }
+
+    @Bean
+    public PropertiesFactoryBean messages(@Value("${localization.file.name}") String fileName) {
+        PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
+        propertiesFactoryBean.setLocation(new ClassPathResource(fileName));
+        return propertiesFactoryBean;
+    }
 }
