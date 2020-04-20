@@ -2,19 +2,13 @@ package space.delusive.discord.broadcastbot.discord.command;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.jagrosh.jdautilities.menu.Paginator;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Role;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import space.delusive.discord.broadcastbot.discord.util.GetChannelListCommandHelper;
 import space.delusive.discord.broadcastbot.domain.YoutubeChannel;
 import space.delusive.discord.broadcastbot.repository.YoutubeChannelRepository;
-import space.delusive.discord.broadcastbot.util.Constants;
 
 import javax.annotation.Resource;
-import java.awt.*;
 import java.util.Map;
 
 @Component
@@ -22,20 +16,17 @@ public class GetYoutubeChannelListCommand extends Command {
     @Resource(name = "messages")
     private Map<String, String> messages;
 
-    @Autowired // because of cyclic dependence between JDA and this bean
-    private JDA jda;
-
     private final YoutubeChannelRepository youtubeChannelRepository;
-    private final EventWaiter eventWaiter;
+    private final GetChannelListCommandHelper helper;
 
 
     public GetYoutubeChannelListCommand(YoutubeChannelRepository youtubeChannelRepository,
-                                        EventWaiter eventWaiter,
+                                        GetChannelListCommandHelper helper,
                                         @Value("${discord.bot.command.get.youtube.channel.list.name}") String name,
                                         @Value("${discord.bot.command.get.youtube.channel.list.help}") String help,
                                         @Value("${discord.bot.command.get.youtube.channel.list.aliases}") String[] aliases) {
         this.youtubeChannelRepository = youtubeChannelRepository;
-        this.eventWaiter = eventWaiter;
+        this.helper = helper;
         super.name = name;
         super.help = help;
         super.aliases = aliases;
@@ -46,33 +37,12 @@ public class GetYoutubeChannelListCommand extends Command {
         String[] textItems = youtubeChannelRepository.findAll().stream()
                 .map(this::getFormattedMessage)
                 .toArray(String[]::new);
-        new Paginator.Builder()
-                .waitOnSinglePage(true)
-                .setEventWaiter(eventWaiter)
-                .setItemsPerPage(2)
-                .setColumns(1)
-                .setBulkSkipNumber(3)
-                .setColor(Color.ORANGE)
-                .addItems(textItems)
-                .setText(messages.get("get.youtube.channel.list.title.message"))
-                .build().display(event.getChannel());
+        String caption = messages.get("get.youtube.channel.list.title.message");
+        helper.getPaginator(textItems, caption).display(event.getChannel());
     }
 
     private String getFormattedMessage(YoutubeChannel channel) {
-        String roleName;
-        switch (channel.getMentionRoleId()) {
-            case Constants.NOBODY_ROLE_NAME_IN_DB:
-                roleName = messages.get("get.youtube.channel.list.channel.mention.role.nobody");
-                break;
-            case Constants.EVERYONE_ROLE_NAME_IN_DB:
-                roleName = messages.get("get.youtube.channel.list.channel.mention.role.everyone");
-                break;
-            default:
-                Role role = jda.getRoleById(channel.getMentionRoleId());
-                roleName = role == null ?
-                        messages.get("get.youtube.channel.list.channel.mention.role.not.found") :
-                        role.getName();
-        }
+        String roleName = helper.getRoleName(channel.getMentionRoleId());
         return messages.get("get.youtube.channel.list.message.pattern")
                 .replaceAll("\\{channel_name}", channel.getChannelName())
                 .replaceAll("\\{channel_id}", channel.getChannelId())
