@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import space.delusive.discord.broadcastbot.discord.DiscordManager;
 import space.delusive.discord.broadcastbot.domain.*;
+import space.delusive.discord.broadcastbot.util.Constants;
 
 import java.util.Optional;
 
@@ -70,8 +71,12 @@ public class DiscordManagerImpl implements DiscordManager {
     }
 
     private Optional<String> getRoleAsMentionIfGood(String roleId) {
-        if (roleId.equalsIgnoreCase("everyone")) return Optional.of("@everyone");
-        if (roleId.equalsIgnoreCase("noone")) return Optional.of("");
+        if (Constants.EVERYONE_ROLE_NAME_IN_DB.equals(roleId)) {
+            return Optional.of("@everyone");
+        }
+        if (Constants.NOBODY_ROLE_NAME_IN_DB.equals(roleId)) {
+            return Optional.of("");
+        }
         Role mentionRole = jda.getRoleById(roleId);
         if (mentionRole == null || isNotMentionable(mentionRole)) {
             log.error("No mention role found or that role is not mentionable. ID: " + roleId);

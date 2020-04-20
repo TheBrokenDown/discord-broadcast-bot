@@ -11,18 +11,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import space.delusive.discord.broadcastbot.domain.YoutubeChannel;
 import space.delusive.discord.broadcastbot.repository.YoutubeChannelRepository;
+import space.delusive.discord.broadcastbot.util.Constants;
 
 import javax.annotation.Resource;
 import java.awt.*;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 public class GetYoutubeChannelListCommand extends Command {
-    private static final String NOBODY_ROLE_NAME = "noone";
-    private static final String EVERYONE_ROLE_NAME = "everyone";
-
     @Resource(name = "messages")
     private Map<String, String> messages;
 
@@ -65,10 +61,10 @@ public class GetYoutubeChannelListCommand extends Command {
     private String getFormattedMessage(YoutubeChannel channel) {
         String roleName;
         switch (channel.getMentionRoleId()) {
-            case NOBODY_ROLE_NAME:
+            case Constants.NOBODY_ROLE_NAME_IN_DB:
                 roleName = messages.get("get.youtube.channel.list.channel.mention.role.nobody");
                 break;
-            case EVERYONE_ROLE_NAME:
+            case Constants.EVERYONE_ROLE_NAME_IN_DB:
                 roleName = messages.get("get.youtube.channel.list.channel.mention.role.everyone");
                 break;
             default:
