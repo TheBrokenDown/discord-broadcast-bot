@@ -37,8 +37,12 @@ public class GetYoutubeChannelListCommand extends Command {
         String[] textItems = youtubeChannelRepository.findAll().stream()
                 .map(this::getFormattedMessage)
                 .toArray(String[]::new);
-        String caption = messages.get("get.youtube.channel.list.title.message");
-        helper.getPaginator(textItems, caption).display(event.getChannel());
+        if (textItems.length == 0) {
+            event.reply(messages.get("get.youtube.channel.list.no.channels.found"));
+        } else {
+            String caption = messages.get("get.youtube.channel.list.title.message");
+            helper.getPaginator(textItems, caption).display(event.getChannel());
+        }
     }
 
     private String getFormattedMessage(YoutubeChannel channel) {
