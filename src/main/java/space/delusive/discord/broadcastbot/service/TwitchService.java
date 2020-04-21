@@ -22,7 +22,7 @@ public class TwitchService {
     private final TwitchIntegration twitchIntegration;
     private final DiscordManager discordManager;
 
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 60000)
     public void run() {
         val channels = twitchChannelRepository.findAll();
         channels.forEach(twitchChannel -> {
