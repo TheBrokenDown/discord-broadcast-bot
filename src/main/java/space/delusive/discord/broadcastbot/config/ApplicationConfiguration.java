@@ -54,8 +54,9 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    MixerIntegration getMixerStreamRepository(@Value("${mixer.api.last.stream.url}") String lastStreamUrl) {
-        return new MixerIntegrationImpl(lastStreamUrl);
+    MixerIntegration getMixerStreamRepository(@Value("${mixer.api.last.stream.url}") String lastStreamUrl,
+                                              @Value("${mixer.api.channel.info.by.name.url}") String channelInfoByNameUrl) {
+        return new MixerIntegrationImpl(lastStreamUrl, channelInfoByNameUrl);
     }
 
     @Bean
