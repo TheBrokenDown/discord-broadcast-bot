@@ -16,12 +16,14 @@ import space.delusive.discord.broadcastbot.integration.dto.TwitchStreamDto;
 public class TwitchIntegrationImpl implements TwitchIntegration {
     private final String url;
     private final String clientId;
+    private final String oauthToken;
 
     @Override
     public TwitchStreamDto getCurrentStream(String userName) throws NoCurrentStreamFoundException, UnsuccessfulRequestException {
         HttpResponse<JsonNode> response = Unirest.get(url)
                 .routeParam("userName", userName)
                 .header("Client-ID", clientId)
+                .header("Authorization", oauthToken)
                 .asJson();
         if (isNotSuccess(response)) {
             throw new UnsuccessfulRequestException(
