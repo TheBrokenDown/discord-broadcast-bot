@@ -49,9 +49,10 @@ public class ApplicationConfiguration {
     @Bean
     TwitchIntegration getTwitchStreamRepository(
             @Value("${twitch.api.client.id}") String clientId,
-            @Value("${twitch.api.oauth.token}") String oauthToken,
-            @Value("${twitch.api.streams.url}") String url) {
-        return new TwitchIntegrationImpl(url, clientId, oauthToken);
+            @Value("${twitch.api.client.secret}") String clientSecret,
+            @Value("${twitch.api.oauth.get.token.url}") String getOAuthTokenUrl,
+            @Value("${twitch.api.streams.url}") String getCurrentStreamUrl) {
+        return new TwitchIntegrationImpl(getCurrentStreamUrl, getOAuthTokenUrl, clientId, clientSecret);
     }
 
     @Bean
