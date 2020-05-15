@@ -4,7 +4,6 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
@@ -63,10 +62,8 @@ public class ApplicationConfiguration {
 
     @Bean
     @SneakyThrows
-    JDA getJda(@Value("${discord.bot.token}") String botToken,
-               @Value("${discord.bot.status}") String status) {
+    JDA getJda(@Value("${discord.bot.token}") String botToken) {
         return new JDABuilder(botToken)
-                .setActivity(Activity.playing(status))
                 .build();
     }
 
