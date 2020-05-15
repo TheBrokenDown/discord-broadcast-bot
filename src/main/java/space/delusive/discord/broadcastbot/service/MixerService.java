@@ -5,13 +5,14 @@ import lombok.extern.log4j.Log4j2;
 import lombok.val;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import space.delusive.discord.broadcastbot.integration.MixerIntegration;
-import space.delusive.discord.broadcastbot.repository.MixerChannelRepository;
-import space.delusive.discord.broadcastbot.repository.MixerStreamRepository;
 import space.delusive.discord.broadcastbot.discord.DiscordManager;
 import space.delusive.discord.broadcastbot.domain.MixerStream;
+import space.delusive.discord.broadcastbot.exception.NoCurrentStreamFoundException;
 import space.delusive.discord.broadcastbot.exception.UnsuccessfulRequestException;
+import space.delusive.discord.broadcastbot.integration.MixerIntegration;
 import space.delusive.discord.broadcastbot.integration.dto.MixerStreamDto;
+import space.delusive.discord.broadcastbot.repository.MixerChannelRepository;
+import space.delusive.discord.broadcastbot.repository.MixerStreamRepository;
 
 import java.util.Optional;
 
@@ -39,6 +40,9 @@ public class MixerService {
         try {
             currentStream = mixerIntegration.getCurrentStream(channelId);
         } catch (UnsuccessfulRequestException e) {
+            log.warn(e);
+            return Optional.empty();
+        } catch (NoCurrentStreamFoundException e) {
             log.debug(e);
             return Optional.empty();
         }

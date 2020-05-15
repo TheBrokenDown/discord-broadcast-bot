@@ -6,7 +6,7 @@ import kong.unirest.Unirest;
 import kong.unirest.json.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.val;
-import space.delusive.discord.broadcastbot.exception.ChannelNotFoundException;
+import space.delusive.discord.broadcastbot.exception.NoCurrentStreamFoundException;
 import space.delusive.discord.broadcastbot.exception.UnsuccessfulRequestException;
 import space.delusive.discord.broadcastbot.integration.MixerIntegration;
 import space.delusive.discord.broadcastbot.integration.dto.MixerStreamDto;
@@ -47,7 +47,7 @@ public class MixerIntegrationImpl implements MixerIntegration {
 
     private void checkResponse(HttpResponse<JsonNode> response) {
         if (response.getStatus() == HTTP_NOT_FOUND) {
-            throw new ChannelNotFoundException();
+            throw new NoCurrentStreamFoundException();
         }
         if (isNotSuccess(response)) {
             throw new UnsuccessfulRequestException(
