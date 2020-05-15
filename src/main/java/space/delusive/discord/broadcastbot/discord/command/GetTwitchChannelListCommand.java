@@ -2,6 +2,7 @@ package space.delusive.discord.broadcastbot.discord.command;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import net.dv8tion.jda.api.Permission;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import space.delusive.discord.broadcastbot.discord.util.GetChannelListCommandHelper;
@@ -25,6 +26,7 @@ public class GetTwitchChannelListCommand extends Command {
                                        @Value("${discord.bot.command.get.twitch.channel.list.name}") String name,
                                        @Value("${discord.bot.command.get.twitch.channel.list.help}") String help,
                                        @Value("${discord.bot.command.get.twitch.channel.list.aliases}") String[] aliases) {
+        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
         this.channelRepository = channelRepository;
         this.helper = helper;
         super.name = name;
