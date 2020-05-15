@@ -1,0 +1,22 @@
+version: '3'
+services:
+  mysql:
+    image: mysql
+    restart: always
+    ports:
+      - 1703:3306 # it enables you to connect to the database remotely via ssh tunnel
+    environment:
+      MYSQL_DATABASE: broadcastbot
+      MYSQL_ROOT_PASSWORD: 123123
+    volumes:
+      - mysql-data:/var/lib/mysql
+  broadcastbot:
+    image: thedelusive/discord-broadcast-bot
+    restart: always
+    depends_on:
+      - mysql
+    volumes:
+    # create folder with file broadcastbot.properties on the host machine and specify here the path to this folder
+    - <PUT_HERE_THE_PATH_TO_THE_FOLDER_WITH_THE_CONFIG_FILE_ON_A_LOCAL_MACHINE>:/app/conf
+volumes:
+  mysql-data:

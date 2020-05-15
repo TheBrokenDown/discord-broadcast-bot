@@ -36,6 +36,10 @@ dependencies {
     compile 'com.konghq:unirest-java:3.3.00'
 }
 
+bootJar {
+    archiveFileName = "discord-broadcast-bot.jar"
+}
+
 test {
     useJUnitPlatform()
 }
