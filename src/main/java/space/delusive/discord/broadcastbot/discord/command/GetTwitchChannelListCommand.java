@@ -7,27 +7,26 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import space.delusive.discord.broadcastbot.discord.util.GetChannelListCommandHelper;
 import space.delusive.discord.broadcastbot.domain.TwitchChannel;
-import space.delusive.discord.broadcastbot.repository.TwitchChannelRepository;
+import space.delusive.discord.broadcastbot.service.TwitchService;
 
 import javax.annotation.Resource;
 import java.util.Map;
-import java.util.stream.StreamSupport;
 
 @Component
 public class GetTwitchChannelListCommand extends Command {
     @Resource(name = "messages")
     private Map<String, String> messages;
 
-    private final TwitchChannelRepository channelRepository;
+    private final TwitchService twitchService;
     private final GetChannelListCommandHelper helper;
 
-    public GetTwitchChannelListCommand(TwitchChannelRepository channelRepository,
+    public GetTwitchChannelListCommand(TwitchService twitchService,
                                        GetChannelListCommandHelper helper,
                                        @Value("${discord.bot.command.get.twitch.channel.list.name}") String name,
                                        @Value("${discord.bot.command.get.twitch.channel.list.help}") String help,
                                        @Value("${discord.bot.command.get.twitch.channel.list.aliases}") String[] aliases) {
         this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
-        this.channelRepository = channelRepository;
+        this.twitchService = twitchService;
         this.helper = helper;
         super.name = name;
         super.help = help;
@@ -36,7 +35,7 @@ public class GetTwitchChannelListCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        String[] textItems = StreamSupport.stream(channelRepository.findAll().spliterator(), false)
+        String[] textItems = twitchService.getAllChannels().stream()
                 .map(this::getFormattedMessage)
                 .toArray(String[]::new);
         if (textItems.length == 0) {

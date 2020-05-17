@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import space.delusive.discord.broadcastbot.discord.util.GetChannelListCommandHelper;
 import space.delusive.discord.broadcastbot.domain.YoutubeChannel;
-import space.delusive.discord.broadcastbot.repository.YoutubeChannelRepository;
+import space.delusive.discord.broadcastbot.service.YoutubeService;
 
 import javax.annotation.Resource;
 import java.util.Map;
@@ -17,17 +17,17 @@ public class GetYoutubeChannelListCommand extends Command {
     @Resource(name = "messages")
     private Map<String, String> messages;
 
-    private final YoutubeChannelRepository youtubeChannelRepository;
+    private final YoutubeService youtubeService;
     private final GetChannelListCommandHelper helper;
 
 
-    public GetYoutubeChannelListCommand(YoutubeChannelRepository youtubeChannelRepository,
+    public GetYoutubeChannelListCommand(YoutubeService youtubeService,
                                         GetChannelListCommandHelper helper,
                                         @Value("${discord.bot.command.get.youtube.channel.list.name}") String name,
                                         @Value("${discord.bot.command.get.youtube.channel.list.help}") String help,
                                         @Value("${discord.bot.command.get.youtube.channel.list.aliases}") String[] aliases) {
         this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
-        this.youtubeChannelRepository = youtubeChannelRepository;
+        this.youtubeService = youtubeService;
         this.helper = helper;
         super.name = name;
         super.help = help;
@@ -36,7 +36,7 @@ public class GetYoutubeChannelListCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        String[] textItems = youtubeChannelRepository.findAll().stream()
+        String[] textItems = youtubeService.getAllChannels().stream()
                 .map(this::getFormattedMessage)
                 .toArray(String[]::new);
         if (textItems.length == 0) {
