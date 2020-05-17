@@ -36,21 +36,16 @@ public class GetChannelListCommandHelper {
     }
 
     public String getRoleName(String roleId) {
-        String roleName;
-        switch (roleId) {
-            case Constants.NOBODY_ROLE_NAME_IN_DB:
-                roleName = messages.get("get.channel.list.mention.role.nobody");
-                break;
-            case Constants.EVERYONE_ROLE_NAME_IN_DB:
-                roleName = messages.get("get.channel.list.mention.role.everyone");
-                break;
-            default:
+        return switch (roleId) {
+            case Constants.NOBODY_ROLE_NAME_IN_DB -> messages.get("get.channel.list.mention.role.nobody");
+            case Constants.EVERYONE_ROLE_NAME_IN_DB -> messages.get("get.channel.list.mention.role.everyone");
+            default -> {
                 Role role = jda.getRoleById(roleId);
-                roleName = role == null ?
+                yield role == null ?
                         messages.get("get.channel.list.mention.role.not.found") :
                         role.getName();
-        }
-        return roleName;
+            }
+        };
     }
 
     @Autowired
