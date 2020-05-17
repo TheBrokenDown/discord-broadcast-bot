@@ -6,6 +6,7 @@ import kong.unirest.Unirest;
 import kong.unirest.json.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.val;
+import space.delusive.discord.broadcastbot.exception.ChannelNotFoundException;
 import space.delusive.discord.broadcastbot.exception.NoCurrentStreamFoundException;
 import space.delusive.discord.broadcastbot.exception.UnsuccessfulRequestException;
 import space.delusive.discord.broadcastbot.integration.MixerIntegration;
@@ -23,7 +24,7 @@ public class MixerIntegrationImpl implements MixerIntegration {
         HttpResponse<JsonNode> response = Unirest.get(lastStreamUrl)
                 .routeParam("channelId", channelId)
                 .asJson();
-        checkResponse(response);
+        checkResponseOfGettingCurrentStream(response);
         val jsonObject = response.getBody().getObject();
         return extractDtoFromJsonObject(jsonObject);
     }
@@ -33,7 +34,7 @@ public class MixerIntegrationImpl implements MixerIntegration {
         HttpResponse<JsonNode> response = Unirest.get(channelInfoByNameUrl)
                 .routeParam("channelName", channelName)
                 .asJson();
-        checkResponse(response);
+        checkResponseOfGettingChannelId(response);
         return String.valueOf(response.getBody().getObject().getInt("id"));
     }
 
@@ -45,18 +46,26 @@ public class MixerIntegrationImpl implements MixerIntegration {
         return new MixerStreamDto(channelId, isTestStream, isOnline, mixerId);
     }
 
-    private void checkResponse(HttpResponse<JsonNode> response) {
+    private void checkResponseOfGettingCurrentStream(HttpResponse<JsonNode> response) {
         if (response.getStatus() == HTTP_NOT_FOUND) {
             throw new NoCurrentStreamFoundException();
         }
-        if (isNotSuccess(response)) {
-            throw new UnsuccessfulRequestException(
-                    String.format("Response status code is not success. The code is %s and the body is %s",
-                            response.getStatus(), response.getBody().toPrettyString()));
-        }
+        checkResponseForSuccess(response);
     }
 
-    private boolean isNotSuccess(HttpResponse<JsonNode> response) {
-        return !response.isSuccess();
+    private void checkResponseOfGettingChannelId(HttpResponse<JsonNode> response) {
+        if (response.getStatus() == HTTP_NOT_FOUND) {
+            throw new ChannelNotFoundException();
+        }
+        checkResponseForSuccess(response);
+    }
+
+    private void checkResponseForSuccess(HttpResponse<JsonNode> response) {
+        if (response.isSuccess()) {
+            return;
+        }
+        throw new UnsuccessfulRequestException(
+                String.format("Response status code is not success. The code is %s and the body is %s",
+                        response.getStatus(), response.getBody().toPrettyString()));
     }
 }
