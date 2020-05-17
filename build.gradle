@@ -6,7 +6,7 @@ plugins {
 
 group = 'space.delusive.discord'
 version = '1.0'
-sourceCompatibility = '13'
+sourceCompatibility = '14'
 
 configurations {
     compile.exclude module: 'spring-boot-starter-logging'
