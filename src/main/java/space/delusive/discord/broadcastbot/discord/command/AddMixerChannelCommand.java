@@ -15,6 +15,7 @@ import space.delusive.discord.broadcastbot.service.MixerService;
 
 import javax.annotation.Resource;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Log4j2
@@ -42,9 +43,10 @@ public class AddMixerChannelCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         event.reply(messages.get("add.mixer.channel.enter.name"));
+        Runnable timeoutAction = () -> event.replyWarning(messages.get("add.mixer.channel.timeout"));
         eventWaiter.waitForEvent(GuildMessageReceivedEvent.class,
                 CommandUtils.getSameAuthorSameChannelDifferentMessagesPredicate(event),
-                getChannelNameReceivedConsumer(event));
+                getChannelNameReceivedConsumer(event), 1, TimeUnit.MINUTES, timeoutAction);
     }
 
     private Consumer<GuildMessageReceivedEvent> getChannelNameReceivedConsumer(CommandEvent event) {
@@ -61,9 +63,10 @@ public class AddMixerChannelCommand extends Command {
                 return;
             }
             event.reply(messages.get("add.mixer.channel.enter.role"));
+            Runnable timeoutAction = () -> event.replyWarning(messages.get("add.mixer.channel.timeout"));
             eventWaiter.waitForEvent(GuildMessageReceivedEvent.class, // wait for a message with role mention from the user
                     CommandUtils.getSameAuthorSameChannelDifferentMessagesPredicate(event),
-                    getMentionRoleReceivedConsumer(event, messageText));
+                    getMentionRoleReceivedConsumer(event, messageText), 1, TimeUnit.MINUTES, timeoutAction);
         };
     }
 
