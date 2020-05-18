@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface MixerChannelRepository extends CrudRepository<MixerChannel, Integer> {
     Optional<MixerChannel> getByChannelName(String channelName);
+
+    void removeByChannelName(String channelName);
 }

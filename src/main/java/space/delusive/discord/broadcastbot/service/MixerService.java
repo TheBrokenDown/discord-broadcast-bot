@@ -34,4 +34,11 @@ public interface MixerService {
      * @return empty optional if the channel doesn't exist, wrapped into the optional channel otherwise
      */
     Optional<MixerChannel> getChannelByName(String name);
+
+    /**
+     * Remove the channel from the database
+     *
+     * @param channelName the name of the channel which should be removed
+     */
+    void removeChannelByName(String channelName);
 }
