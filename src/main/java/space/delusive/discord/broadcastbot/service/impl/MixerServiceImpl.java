@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import space.delusive.discord.broadcastbot.discord.DiscordManager;
 import space.delusive.discord.broadcastbot.domain.MixerChannel;
 import space.delusive.discord.broadcastbot.domain.MixerStream;
+import space.delusive.discord.broadcastbot.exception.ChannelNotFoundException;
 import space.delusive.discord.broadcastbot.exception.NoCurrentStreamFoundException;
 import space.delusive.discord.broadcastbot.exception.UnsuccessfulRequestException;
 import space.delusive.discord.broadcastbot.integration.MixerIntegration;
@@ -71,5 +72,30 @@ public class MixerServiceImpl implements MixerService, Runnable {
         val channels = new ArrayList<MixerChannel>();
         mixerChannelRepository.findAll().forEach(channels::add);
         return channels;
+    }
+
+    @Override
+    public void addChannel(String channelName, String mentionRole) throws ChannelNotFoundException {
+        MixerChannel mixerChannel = new MixerChannel();
+        mixerChannel.setChannelName(channelName);
+        mixerChannel.setChannelId(mixerIntegration.getChannelIdByName(channelName));
+        mixerChannel.setMentionRoleId(mentionRole);
+        mixerChannelRepository.save(mixerChannel);
+    }
+
+    @Override
+    public boolean checkChannelExistence(String channelName) {
+        try {
+            mixerIntegration.getChannelIdByName(channelName);
+            return true;
+        } catch (ChannelNotFoundException e) {
+            log.debug(e);
+        }
+        return false;
+    }
+
+    @Override
+    public Optional<MixerChannel> getChannelByName(String name) {
+        return mixerChannelRepository.getByChannelName(name);
     }
 }
