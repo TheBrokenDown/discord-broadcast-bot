@@ -28,9 +28,11 @@ public class DiscordManagerImpl implements DiscordManager {
     public void informAboutNewVideoOnYoutube(YoutubeChannel youtubeChannel, YoutubeVideo youtubeVideo) {
         val optionalTextChannel = getChannelIfGood();
         val optionalRoleAsMention = getRoleAsMentionIfGood(youtubeChannel.getMentionRoleId());
-        if (optionalTextChannel.isEmpty() || optionalRoleAsMention.isEmpty()) return;
+        if (optionalTextChannel.isEmpty()) {
+            return;
+        }
         val message = youtubeVideoMessagePattern
-                .replaceAll("\\{mention\\}", optionalRoleAsMention.get())
+                .replaceAll("\\{mention\\}", optionalRoleAsMention.orElse(""))
                 .replaceAll("\\{channelTitle\\}", youtubeChannel.getChannelName())
                 .replaceAll("\\{videoLink\\}", youtubeVideoBaseLink + youtubeVideo.getYoutubeId());
         optionalTextChannel.get().sendMessage(message).queue();
@@ -40,9 +42,11 @@ public class DiscordManagerImpl implements DiscordManager {
     public void informAboutBeginningOfStreamOnTwitch(TwitchChannel twitchChannel, TwitchStream twitchStream) {
         val optionalTextChannel = getChannelIfGood();
         val optionalRoleAsMention = getRoleAsMentionIfGood(twitchChannel.getMentionRoleId());
-        if (optionalTextChannel.isEmpty() || optionalRoleAsMention.isEmpty()) return;
+        if (optionalTextChannel.isEmpty()) {
+            return;
+        }
         val message = twitchStreamMessagePattern
-                .replaceAll("\\{mention\\}", optionalRoleAsMention.get())
+                .replaceAll("\\{mention\\}", optionalRoleAsMention.orElse(""))
                 .replaceAll("\\{channelName\\}", twitchChannel.getChannelName())
                 .replaceAll("\\{streamTitle\\}", twitchStream.getTitle())
                 .replaceAll("\\{streamLink\\}", twitchStreamBaseLink + twitchChannel.getChannelName());
@@ -53,9 +57,11 @@ public class DiscordManagerImpl implements DiscordManager {
     public void informAboutBeginningOfStreamOnMixer(MixerChannel mixerChannel, MixerStream mixerStream) {
         val optionalTextChannel = getChannelIfGood();
         val optionalRoleAsMention = getRoleAsMentionIfGood(mixerChannel.getMentionRoleId());
-        if (optionalTextChannel.isEmpty() || optionalRoleAsMention.isEmpty()) return;
+        if (optionalTextChannel.isEmpty()) {
+            return;
+        }
         val message = mixerStreamMessagePattern
-                .replaceAll("\\{mention\\}", optionalRoleAsMention.get())
+                .replaceAll("\\{mention\\}", optionalRoleAsMention.orElse(""))
                 .replaceAll("\\{channelName\\}", mixerChannel.getChannelName())
                 .replaceAll("\\{streamLink\\}", mixerStreamBaseLink + mixerChannel.getChannelName());
         optionalTextChannel.get().sendMessage(message).queue();
