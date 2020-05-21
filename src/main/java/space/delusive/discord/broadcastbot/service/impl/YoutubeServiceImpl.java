@@ -24,7 +24,7 @@ public class YoutubeServiceImpl implements YoutubeService, Runnable {
     private final YoutubeIntegration youtubeIntegration;
     private final DiscordManager discordManager;
 
-    @Scheduled(fixedDelay = 130000) // run every 130 seconds
+    @Scheduled(fixedDelay = 300000) // run every 5 minutes
     public void run() {
         Iterable<YoutubeChannel> channels = youtubeChannelRepository.findAll();
         channels.forEach(youtubeChannel -> {
