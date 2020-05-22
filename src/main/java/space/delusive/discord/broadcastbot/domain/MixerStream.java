@@ -2,8 +2,6 @@ package space.delusive.discord.broadcastbot.domain;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,12 +11,13 @@ import javax.persistence.Id;
 @Entity
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class MixerStream {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-
-    @NonNull
     private String mixerId;
+
+    public MixerStream(String mixerId) {
+        this.mixerId = mixerId;
+    }
 }

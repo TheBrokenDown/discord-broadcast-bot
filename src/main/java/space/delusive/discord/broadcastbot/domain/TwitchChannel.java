@@ -15,8 +15,6 @@ public class TwitchChannel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-
     private String channelName;
-
     private String mentionRoleId;
 }

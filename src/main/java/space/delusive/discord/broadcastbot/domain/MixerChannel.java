@@ -15,10 +15,7 @@ public class MixerChannel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-
     private String channelName;
-
     private String channelId;
-
     private String mentionRoleId;
 }

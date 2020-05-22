@@ -9,14 +9,9 @@ import java.time.LocalDateTime;
 @Value
 @RequiredArgsConstructor
 public class YoutubeVideoDto {
-    @NonNull
-    LocalDateTime publishedAt;
-    @NonNull
-    String title;
-    @NonNull
-    String description;
-    @NonNull
-    String videoId;
-    @NonNull
-    String channelTitle;
+    @NonNull LocalDateTime publishedAt;
+    @NonNull String title;
+    @NonNull String description;
+    @NonNull String videoId;
+    @NonNull String channelTitle;
 }
