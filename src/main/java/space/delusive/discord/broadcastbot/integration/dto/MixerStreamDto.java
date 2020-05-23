@@ -1,12 +1,12 @@
 package space.delusive.discord.broadcastbot.integration.dto;
 
-import lombok.NonNull;
+import com.google.gson.annotations.SerializedName;
 import lombok.Value;
 
 @Value
 public class MixerStreamDto {
-    @NonNull String channelId;
-    @NonNull boolean isTestStream;
-    @NonNull boolean isOnline;
-    @NonNull String id;
+    @SerializedName("channelId") String channelId;
+    @SerializedName("isTestStream") boolean isTestStream;
+    @SerializedName("online") boolean isOnline;
+    @SerializedName("id") String id;
 }

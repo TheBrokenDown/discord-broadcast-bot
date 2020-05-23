@@ -1,5 +1,6 @@
 package space.delusive.discord.broadcastbot.integration.impl;
 
+import com.google.gson.Gson;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
@@ -24,31 +25,35 @@ public class TwitchIntegrationImpl implements TwitchIntegration {
     private final String getOAuthTokenUrl;
     private final String clientId;
     private final String clientSecret;
+    private final Gson gson;
 
     private OAuthToken oauthToken;
 
     @Override
-    public TwitchStreamDto getCurrentStream(String userName) throws NoCurrentStreamFoundException, UnsuccessfulRequestException {
+    public TwitchStreamDto getCurrentStream(String userName)
+            throws NoCurrentStreamFoundException, UnsuccessfulRequestException {
         updateTokenIfNecessary();
+        val authorizationHeader = StringUtils.capitalize(oauthToken.getTokenType()) + " " + oauthToken.getAccessToken();
         HttpResponse<JsonNode> response = Unirest.get(getCurrentStreamUrl)
                 .routeParam("userName", userName)
                 .header("Client-ID", clientId)
-                .header("Authorization", StringUtils.capitalize(oauthToken.getTokenType()) + " " + oauthToken.getAccessToken())
+                .header("Authorization", authorizationHeader)
                 .asJson();
-        log.debug("Request to get current stream on Twitch channel with name \"{}\" has been sent. Following answer has been received. Status: \"{}\", Body: \"{}\"",
+        log.debug("Request to get current stream on Twitch channel with name \"{}\" has been sent. " +
+                        "Following answer has been received. Status: \"{}\", Body: \"{}\"",
                 userName, response.getStatusText(), response.getBody().toString());
         checkForSuccess(response);
         JSONArray data = response.getBody().getObject().getJSONArray("data");
-        if (data.isEmpty()) throw new NoCurrentStreamFoundException();
-        val streamInfo = (JSONObject) data.get(0);
-        val streamId = streamInfo.getString("id");
-        val userId = streamInfo.getString("user_id");
-        val trueUserName = streamInfo.getString("user_name");
-        val title = streamInfo.getString("title");
-        return new TwitchStreamDto(streamId, userId, trueUserName, title);
+        if (data.isEmpty()) {
+            throw new NoCurrentStreamFoundException();
+        }
+        return gson.fromJson(data.getJSONObject(0).toString(), TwitchStreamDto.class);
     }
 
-    private void updateTokenIfNecessary() { // twitch invalidates an oauth token after some time so we will need to get another one if invalidating happens
+    /**
+     * Twitch invalidates an oauth token after some time so we will need to get another one if invalidating happens
+     */
+    private void updateTokenIfNecessary() {
         // if token is going to be expired soon
         if (oauthToken == null || oauthToken.getExpiresIn().minusSeconds(10).isBefore(LocalDateTime.now())) {
             oauthToken = getNewToken();
@@ -60,10 +65,11 @@ public class TwitchIntegrationImpl implements TwitchIntegration {
                 .routeParam("clientId", clientId)
                 .routeParam("clientSecret", clientSecret)
                 .asJson();
-        log.debug("Request to get new OAuth token on Twitch has been sent. Following answer has been received. Status: \"{}\", Body: \"{}\"",
-                response.getStatusText(), response.getBody().toPrettyString());
+        log.debug("Request to get new OAuth token on Twitch has been sent. Following answer has been received. " +
+                "Status: \"{}\", Body: \"{}\"", response.getStatusText(), response.getBody().toPrettyString());
         checkForSuccess(response);
         JSONObject jsonObject = response.getBody().getObject();
+        // we are not able to use GSON here because we have to calculate expiresIn field value
         val accessToken = jsonObject.getString("access_token");
         val tokenType = jsonObject.getString("token_type");
         val expiresIn = LocalDateTime.now().plusSeconds(jsonObject.getInt("expires_in"));

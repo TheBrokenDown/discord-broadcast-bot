@@ -1,12 +1,11 @@
 package space.delusive.discord.broadcastbot.integration.impl;
 
+import com.google.gson.Gson;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
-import kong.unirest.json.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import lombok.val;
 import space.delusive.discord.broadcastbot.exception.ChannelNotFoundException;
 import space.delusive.discord.broadcastbot.exception.NoCurrentStreamFoundException;
 import space.delusive.discord.broadcastbot.exception.UnsuccessfulRequestException;
@@ -20,17 +19,18 @@ public class MixerIntegrationImpl implements MixerIntegration {
 
     private final String lastStreamUrl;
     private final String channelInfoByNameUrl;
+    private final Gson gson;
 
     @Override
     public MixerStreamDto getCurrentStream(String channelId) {
         HttpResponse<JsonNode> response = Unirest.get(lastStreamUrl)
                 .routeParam("channelId", channelId)
                 .asJson();
-        log.debug("Request to get current stream on Mixer channel with id \"{}\" has been sent. Following answer has been received. Status: \"{}\", Body: \"{}\"",
+        log.debug("Request to get current stream on Mixer channel with id \"{}\" has been sent. " +
+                        "Following answer has been received. Status: \"{}\", Body: \"{}\"",
                 channelId, response.getStatusText(), response.getBody().toString());
         checkResponseOfGettingCurrentStream(response);
-        val jsonObject = response.getBody().getObject();
-        return extractDtoFromJsonObject(jsonObject);
+        return gson.fromJson(response.getBody().toString(), MixerStreamDto.class);
     }
 
     @Override
@@ -38,18 +38,11 @@ public class MixerIntegrationImpl implements MixerIntegration {
         HttpResponse<JsonNode> response = Unirest.get(channelInfoByNameUrl)
                 .routeParam("channelName", channelName)
                 .asJson();
-        log.debug("Request to get channel id by name \"{}\" on Mixer has been sent. Following answer has been received. Status: \"{}\", Body: \"{}\"",
+        log.debug("Request to get channel id by name \"{}\" on Mixer has been sent. " +
+                        "Following answer has been received. Status: \"{}\", Body: \"{}\"",
                 channelName, response.getStatusText(), response.getBody().toString());
         checkResponseOfGettingChannelId(response);
         return String.valueOf(response.getBody().getObject().getInt("id"));
-    }
-
-    private MixerStreamDto extractDtoFromJsonObject(JSONObject jsonObject) { // TODO: 12/23/2019 check does stream exist
-        val channelId = String.valueOf(jsonObject.getInt("channelId"));
-        val isTestStream = jsonObject.getBoolean("isTestStream");
-        val isOnline = jsonObject.getBoolean("online");
-        val mixerId = jsonObject.getString("id");
-        return new MixerStreamDto(channelId, isTestStream, isOnline, mixerId);
     }
 
     private void checkResponseOfGettingCurrentStream(HttpResponse<JsonNode> response) {

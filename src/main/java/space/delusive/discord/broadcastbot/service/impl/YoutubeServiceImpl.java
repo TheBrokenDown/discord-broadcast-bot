@@ -8,7 +8,6 @@ import space.delusive.discord.broadcastbot.discord.DiscordManager;
 import space.delusive.discord.broadcastbot.domain.YoutubeChannel;
 import space.delusive.discord.broadcastbot.domain.YoutubeVideo;
 import space.delusive.discord.broadcastbot.integration.YoutubeIntegration;
-import space.delusive.discord.broadcastbot.integration.dto.YoutubeVideoDto;
 import space.delusive.discord.broadcastbot.repository.YoutubeChannelRepository;
 import space.delusive.discord.broadcastbot.repository.YoutubeVideoRepository;
 import space.delusive.discord.broadcastbot.service.YoutubeService;
@@ -35,10 +34,11 @@ public class YoutubeServiceImpl implements YoutubeService, Runnable {
     }
 
     private Optional<YoutubeVideo> getNewVideo(String playlistId) {
-        YoutubeVideoDto lastUploadedVideo = youtubeIntegration.getLastUploadedVideoByPlaylistId(playlistId);
-        val optionalVideoFromDb = youtubeVideoRepository.getByYoutubeId(lastUploadedVideo.getVideoId());
-        if (optionalVideoFromDb.isEmpty()) { //we don't know about last uploaded video so it is new
-            YoutubeVideo youtubeVideo = new YoutubeVideo(lastUploadedVideo.getVideoId());
+        val youtubeVideoDto = youtubeIntegration.getLastUploadedVideoByPlaylistId(playlistId);
+        val lastYoutubeVideoId = youtubeVideoDto.getItems().get(0).getSnippet().getResourceId().getVideoId();
+        val optionalVideoFromDb = youtubeVideoRepository.getByYoutubeId(lastYoutubeVideoId);
+        if (optionalVideoFromDb.isEmpty()) { // we don't know about last uploaded video so it is new
+            YoutubeVideo youtubeVideo = new YoutubeVideo(lastYoutubeVideoId);
             youtubeVideoRepository.save(youtubeVideo);
             return Optional.of(youtubeVideo);
         }

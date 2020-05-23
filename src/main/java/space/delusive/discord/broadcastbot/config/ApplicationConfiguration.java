@@ -1,5 +1,6 @@
 package space.delusive.discord.broadcastbot.config;
 
+import com.google.gson.Gson;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.JDA;
@@ -25,7 +26,6 @@ import space.delusive.discord.broadcastbot.integration.impl.YoutubeIntegrationIm
 @ComponentScan
 @EnableScheduling
 public class ApplicationConfiguration {
-
     @Bean
     DiscordManager getDiscordManager(
             @Value("${discord.message.pattern.youtube.video}") String youtubeVideoMessagePattern,
@@ -40,9 +40,9 @@ public class ApplicationConfiguration {
     @Bean
     YoutubeIntegration getYoutubeVideoRepository(
             @Value("${youtube.api.token}") String apiToken,
-            @Value("${youtube.api.search.url}") String searchUrl,
-            @Value("${youtube.api.videos.from.playlist.url}") String videosFromPlaylistUrl) {
-        return new YoutubeIntegrationImpl(searchUrl, videosFromPlaylistUrl, apiToken);
+            @Value("${youtube.api.videos.from.playlist.url}") String videosFromPlaylistUrl,
+            Gson gson) {
+        return new YoutubeIntegrationImpl(videosFromPlaylistUrl, apiToken, gson);
     }
 
     @Bean
@@ -50,14 +50,16 @@ public class ApplicationConfiguration {
             @Value("${twitch.api.client.id}") String clientId,
             @Value("${twitch.api.client.secret}") String clientSecret,
             @Value("${twitch.api.oauth.get.token.url}") String getOAuthTokenUrl,
-            @Value("${twitch.api.streams.url}") String getCurrentStreamUrl) {
-        return new TwitchIntegrationImpl(getCurrentStreamUrl, getOAuthTokenUrl, clientId, clientSecret);
+            @Value("${twitch.api.streams.url}") String getCurrentStreamUrl,
+            Gson gson) {
+        return new TwitchIntegrationImpl(getCurrentStreamUrl, getOAuthTokenUrl, clientId, clientSecret, gson);
     }
 
     @Bean
     MixerIntegration getMixerStreamRepository(@Value("${mixer.api.last.stream.url}") String lastStreamUrl,
-                                              @Value("${mixer.api.channel.info.by.name.url}") String channelInfoByNameUrl) {
-        return new MixerIntegrationImpl(lastStreamUrl, channelInfoByNameUrl);
+                                              @Value("${mixer.api.channel.info.by.name.url}") String channelInfoByNameUrl,
+                                              Gson gson) {
+        return new MixerIntegrationImpl(lastStreamUrl, channelInfoByNameUrl, gson);
     }
 
     @Bean
@@ -68,12 +70,17 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public EventWaiter eventWaiter() {
+    Gson gson() {
+        return new Gson();
+    }
+
+    @Bean
+    EventWaiter eventWaiter() {
         return new EventWaiter();
     }
 
     @Bean
-    public PropertiesFactoryBean messages(@Value("${localization.file.name}") String fileName) {
+    PropertiesFactoryBean messages(@Value("${localization.file.name}") String fileName) {
         PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
         propertiesFactoryBean.setLocation(new ClassPathResource(fileName));
         return propertiesFactoryBean;

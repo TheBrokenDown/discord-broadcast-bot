@@ -1,12 +1,12 @@
 package space.delusive.discord.broadcastbot.integration.dto;
 
-import lombok.NonNull;
+import com.google.gson.annotations.SerializedName;
 import lombok.Value;
 
 @Value
 public class TwitchStreamDto {
-    @NonNull String streamId;
-    @NonNull String userId;
-    @NonNull String userName;
-    @NonNull String title;
+    @SerializedName("id") String streamId;
+    @SerializedName("user_id") String userId;
+    @SerializedName("user_name") String userName;
+    @SerializedName("title") String title;
 }

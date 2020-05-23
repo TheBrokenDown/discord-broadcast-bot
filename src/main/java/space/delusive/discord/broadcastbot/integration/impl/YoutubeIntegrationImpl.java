@@ -1,37 +1,21 @@
 package space.delusive.discord.broadcastbot.integration.impl;
 
+import com.google.gson.Gson;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
-import kong.unirest.json.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import lombok.val;
 import space.delusive.discord.broadcastbot.exception.UnsuccessfulRequestException;
 import space.delusive.discord.broadcastbot.integration.YoutubeIntegration;
 import space.delusive.discord.broadcastbot.integration.dto.YoutubeVideoDto;
 
-import java.time.LocalDateTime;
-
 @Log4j2
 @AllArgsConstructor
 public class YoutubeIntegrationImpl implements YoutubeIntegration {
-    private final String searchVideosByChannelIdUrl;
     private final String getVideosFromPlaylistUrl;
     private final String apiToken;
-
-    @Override
-    public YoutubeVideoDto getLastUploadedVideoByChannelId(String channelId) throws UnsuccessfulRequestException {
-        HttpResponse<JsonNode> response = Unirest.get(searchVideosByChannelIdUrl)
-                .routeParam("channelId", channelId)
-                .routeParam("apiToken", apiToken)
-                .asJson();
-        log.debug("Request to get last uploaded video on YouTube channel with id \"{}\" has been sent. Following answer has been received. Status: \"{}\" Body: \"{}\"",
-                channelId, response.getStatusText(), response.getBody().toString());
-        checkResponseForSuccess(response);
-        val jsonObject = (JSONObject) response.getBody().getObject().getJSONArray("items").get(0); // TODO: 12/22/2019 review case if there is no videos available
-        return extractVideoDtoFromJsonObjectByChannelId(jsonObject);
-    }
+    private final Gson gson;
 
     @Override
     public YoutubeVideoDto getLastUploadedVideoByPlaylistId(String playlistId) {
@@ -39,31 +23,11 @@ public class YoutubeIntegrationImpl implements YoutubeIntegration {
                 .routeParam("playlistId", playlistId)
                 .routeParam("apiToken", apiToken)
                 .asJson();
-        log.debug("Request to get last uploaded video on YouTube by playlist id \"{}\" has been sent. Following answer has been received. Status: \"{}\" Body: \"{}\"",
+        log.debug("Request to get last uploaded video on YouTube by playlist id \"{}\" has been sent. " +
+                        "Following answer has been received. Status: \"{}\" Body: \"{}\"",
                 playlistId, response.getStatusText(), response.getBody().toString());
         checkResponseForSuccess(response);
-        val jsonObject = (JSONObject) response.getBody().getObject().getJSONArray("items").get(0); // TODO: 12/23/2019 here too :p
-        return extractVideoDtoFromJsonObjectByPlaylistId(jsonObject);
-    }
-
-    private YoutubeVideoDto extractVideoDtoFromJsonObjectByChannelId(JSONObject jsonObject) {
-        val videoId = jsonObject.getJSONObject("id").getString("videoId");
-        val snippet = jsonObject.getJSONObject("snippet");
-        return generateDtoFromSnippetAndId(videoId, snippet);
-    }
-
-    private YoutubeVideoDto extractVideoDtoFromJsonObjectByPlaylistId(JSONObject jsonObject) {
-        val snippet = jsonObject.getJSONObject("snippet");
-        val videoId = snippet.getJSONObject("resourceId").getString("videoId");
-        return generateDtoFromSnippetAndId(videoId, snippet);
-    }
-
-    private YoutubeVideoDto generateDtoFromSnippetAndId(String id, JSONObject snippet) {
-        val publishTime = LocalDateTime.parse(snippet.getString("publishedAt").replaceFirst(".$", ""));
-        val title = snippet.getString("title");
-        val description = snippet.getString("description");
-        val channelTitle = snippet.getString("channelTitle");
-        return new YoutubeVideoDto(publishTime, title, description, id, channelTitle);
+        return gson.fromJson(response.getBody().toString(), YoutubeVideoDto.class);
     }
 
     private void checkResponseForSuccess(HttpResponse<JsonNode> response) throws UnsuccessfulRequestException {
@@ -74,7 +38,7 @@ public class YoutubeIntegrationImpl implements YoutubeIntegration {
         }
     }
 
-    private boolean isNotSuccess(HttpResponse response) {
+    private boolean isNotSuccess(HttpResponse<?> response) {
         return !response.isSuccess();
     }
 }
