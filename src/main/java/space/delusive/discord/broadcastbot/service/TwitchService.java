@@ -34,4 +34,11 @@ public interface TwitchService {
      * @return empty optional if there is no such channel, wrapped into the optional channel object otherwise
      */
     Optional<TwitchChannel> getChannelByName(String channelName);
+
+    /**
+     * Remove the Twitch channel from the database
+     *
+     * @param channelName the name of the channel
+     */
+    void removeChannelByName(String channelName);
 }

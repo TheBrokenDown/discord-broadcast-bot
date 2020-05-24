@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import lombok.val;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import space.delusive.discord.broadcastbot.discord.DiscordManager;
 import space.delusive.discord.broadcastbot.domain.TwitchChannel;
 import space.delusive.discord.broadcastbot.domain.TwitchStream;
@@ -88,5 +89,11 @@ public class TwitchServiceImpl implements TwitchService, Runnable {
     @Override
     public Optional<TwitchChannel> getChannelByName(String channelName) {
         return twitchChannelRepository.getByChannelName(channelName);
+    }
+
+    @Override
+    @Transactional
+    public void removeChannelByName(String channelName) {
+        twitchChannelRepository.removeByChannelName(channelName);
     }
 }
