@@ -11,6 +11,7 @@ import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import lombok.val;
 import org.springframework.util.StringUtils;
+import space.delusive.discord.broadcastbot.exception.InvalidTwitchChannelNameException;
 import space.delusive.discord.broadcastbot.exception.NoCurrentStreamFoundException;
 import space.delusive.discord.broadcastbot.exception.UnsuccessfulRequestException;
 import space.delusive.discord.broadcastbot.integration.TwitchIntegration;
@@ -22,6 +23,8 @@ import java.time.LocalDateTime;
 @Log4j2
 @RequiredArgsConstructor
 public class TwitchIntegrationImpl implements TwitchIntegration {
+    private static final int HTTP_BAD_REQUEST = 400;
+
     private final String getCurrentStreamUrl;
     private final String getUserInfoUrl;
     private final String getOAuthTokenUrl;
@@ -52,7 +55,7 @@ public class TwitchIntegrationImpl implements TwitchIntegration {
     }
 
     @Override
-    public TwitchUserInfoDto getUserInfo(String userName) {
+    public TwitchUserInfoDto getUserInfo(String userName) throws InvalidTwitchChannelNameException {
         updateTokenIfNecessary();
         HttpResponse<JsonNode> response = Unirest.get(getUserInfoUrl)
                 .routeParam("userName", userName)
@@ -62,7 +65,7 @@ public class TwitchIntegrationImpl implements TwitchIntegration {
         log.debug("Request to get info about user \"{}\" from Twitch has been sent. " +
                         "Following answer has been received. Status: \"{}\", Body: \"{}\"",
                 userName, response.getStatusText(), response.getBody().toString());
-        checkForSuccess(response);
+        checkGetUserInfoResponseForSuccess(response);
         return gson.fromJson(response.getBody().getObject().toString(), TwitchUserInfoDto.class);
     }
 
@@ -94,6 +97,13 @@ public class TwitchIntegrationImpl implements TwitchIntegration {
 
     private String getAuthorizationHeader() {
         return StringUtils.capitalize(oauthToken.getTokenType()) + " " + oauthToken.getAccessToken();
+    }
+
+    private void checkGetUserInfoResponseForSuccess(HttpResponse<JsonNode> httpResponse) {
+        if (httpResponse.getStatus() == HTTP_BAD_REQUEST) {
+            throw new InvalidTwitchChannelNameException();
+        }
+        checkForSuccess(httpResponse);
     }
 
     private void checkForSuccess(HttpResponse<JsonNode> httpResponse) {
