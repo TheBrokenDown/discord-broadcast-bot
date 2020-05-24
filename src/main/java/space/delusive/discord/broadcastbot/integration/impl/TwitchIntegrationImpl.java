@@ -15,6 +15,7 @@ import space.delusive.discord.broadcastbot.exception.NoCurrentStreamFoundExcepti
 import space.delusive.discord.broadcastbot.exception.UnsuccessfulRequestException;
 import space.delusive.discord.broadcastbot.integration.TwitchIntegration;
 import space.delusive.discord.broadcastbot.integration.dto.TwitchStreamDto;
+import space.delusive.discord.broadcastbot.integration.dto.TwitchUserInfoDto;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class TwitchIntegrationImpl implements TwitchIntegration {
     private final String getCurrentStreamUrl;
+    private final String getUserInfoUrl;
     private final String getOAuthTokenUrl;
     private final String clientId;
     private final String clientSecret;
@@ -33,11 +35,10 @@ public class TwitchIntegrationImpl implements TwitchIntegration {
     public TwitchStreamDto getCurrentStream(String userName)
             throws NoCurrentStreamFoundException, UnsuccessfulRequestException {
         updateTokenIfNecessary();
-        val authorizationHeader = StringUtils.capitalize(oauthToken.getTokenType()) + " " + oauthToken.getAccessToken();
         HttpResponse<JsonNode> response = Unirest.get(getCurrentStreamUrl)
                 .routeParam("userName", userName)
                 .header("Client-ID", clientId)
-                .header("Authorization", authorizationHeader)
+                .header("Authorization", getAuthorizationHeader())
                 .asJson();
         log.debug("Request to get current stream on Twitch channel with name \"{}\" has been sent. " +
                         "Following answer has been received. Status: \"{}\", Body: \"{}\"",
@@ -48,6 +49,21 @@ public class TwitchIntegrationImpl implements TwitchIntegration {
             throw new NoCurrentStreamFoundException();
         }
         return gson.fromJson(data.getJSONObject(0).toString(), TwitchStreamDto.class);
+    }
+
+    @Override
+    public TwitchUserInfoDto getUserInfo(String userName) {
+        updateTokenIfNecessary();
+        HttpResponse<JsonNode> response = Unirest.get(getUserInfoUrl)
+                .routeParam("userName", userName)
+                .header("Client-ID", clientId)
+                .header("Authorization", getAuthorizationHeader())
+                .asJson();
+        log.debug("Request to get info about user \"{}\" from Twitch has been sent. " +
+                        "Following answer has been received. Status: \"{}\", Body: \"{}\"",
+                userName, response.getStatusText(), response.getBody().toString());
+        checkForSuccess(response);
+        return gson.fromJson(response.getBody().getObject().toString(), TwitchUserInfoDto.class);
     }
 
     /**
@@ -74,6 +90,10 @@ public class TwitchIntegrationImpl implements TwitchIntegration {
         val tokenType = jsonObject.getString("token_type");
         val expiresIn = LocalDateTime.now().plusSeconds(jsonObject.getInt("expires_in"));
         return new OAuthToken(accessToken, tokenType, expiresIn);
+    }
+
+    private String getAuthorizationHeader() {
+        return StringUtils.capitalize(oauthToken.getTokenType()) + " " + oauthToken.getAccessToken();
     }
 
     private void checkForSuccess(HttpResponse<JsonNode> httpResponse) {

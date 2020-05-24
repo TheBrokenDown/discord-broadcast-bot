@@ -51,8 +51,10 @@ public class ApplicationConfiguration {
             @Value("${twitch.api.client.secret}") String clientSecret,
             @Value("${twitch.api.oauth.get.token.url}") String getOAuthTokenUrl,
             @Value("${twitch.api.streams.url}") String getCurrentStreamUrl,
+            @Value("${twitch.api.get.user.info.url}") String getUserInfoUrl,
             Gson gson) {
-        return new TwitchIntegrationImpl(getCurrentStreamUrl, getOAuthTokenUrl, clientId, clientSecret, gson);
+        return new TwitchIntegrationImpl(getCurrentStreamUrl, getUserInfoUrl, getOAuthTokenUrl, clientId, clientSecret,
+                gson);
     }
 
     @Bean
