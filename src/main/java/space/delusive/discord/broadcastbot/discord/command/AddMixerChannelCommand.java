@@ -56,8 +56,8 @@ public class AddMixerChannelCommand extends Command {
                 event.replyError(messages.get("add.mixer.channel.invalid.name"));
                 return;
             }
-            boolean doesChannelAlreadyRegistered = mixerService.getChannelByName(messageText).isPresent();
-            if (doesChannelAlreadyRegistered) {
+            boolean isChannelAlreadyRegistered = mixerService.getChannelByName(messageText).isPresent();
+            if (isChannelAlreadyRegistered) {
                 event.replyError(messages.get("add.mixer.channel.already.exist"));
                 return;
             }
