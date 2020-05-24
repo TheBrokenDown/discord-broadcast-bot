@@ -14,11 +14,10 @@ import java.util.Map;
 
 @Component
 public class GetTwitchChannelListCommand extends Command {
-    @Resource(name = "messages")
-    private Map<String, String> messages;
-
     private final TwitchService twitchService;
     private final GetChannelListCommandHelper helper;
+
+    private Map<String, String> messages;
 
     public GetTwitchChannelListCommand(TwitchService twitchService,
                                        GetChannelListCommandHelper helper,
@@ -51,5 +50,10 @@ public class GetTwitchChannelListCommand extends Command {
         return messages.get("get.twitch.channel.list.message.pattern")
                 .replaceAll("\\{channel_name}", channel.getChannelName())
                 .replaceAll("\\{mention_role}", roleName);
+    }
+
+    @Resource(name = "messages")
+    public void setMessages(Map<String, String> messages) {
+        this.messages = messages;
     }
 }

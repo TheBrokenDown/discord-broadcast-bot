@@ -21,11 +21,10 @@ import java.util.function.Consumer;
 @Log4j2
 @Component
 public class AddMixerChannelCommand extends Command {
-    @Resource(name = "messages")
-    private Map<String, String> messages;
-
     private final MixerService mixerService;
     private final EventWaiter eventWaiter;
+
+    private Map<String, String> messages;
 
     public AddMixerChannelCommand(MixerService mixerService,
                                   EventWaiter eventWaiter,
@@ -88,5 +87,10 @@ public class AddMixerChannelCommand extends Command {
             mixerService.addChannel(channelName, mentionedRoleId);
             event.replySuccess(messages.get("add.mixer.channel.success"));
         };
+    }
+
+    @Resource(name = "messages")
+    public void setMessages(Map<String, String> messages) {
+        this.messages = messages;
     }
 }

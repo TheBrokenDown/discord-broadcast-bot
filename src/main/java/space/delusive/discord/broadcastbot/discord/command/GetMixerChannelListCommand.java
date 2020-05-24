@@ -14,11 +14,10 @@ import java.util.Map;
 
 @Component
 public class GetMixerChannelListCommand extends Command {
-    @Resource(name = "messages")
-    private Map<String, String> messages;
-
     private final MixerService mixerService;
     private final GetChannelListCommandHelper helper;
+
+    private Map<String, String> messages;
 
     public GetMixerChannelListCommand(MixerService mixerService,
                                       GetChannelListCommandHelper helper,
@@ -52,5 +51,10 @@ public class GetMixerChannelListCommand extends Command {
                 .replaceAll("\\{channel_name}", channel.getChannelName())
                 .replaceAll("\\{channel_id}", channel.getChannelId())
                 .replaceAll("\\{mention_role}", roleName);
+    }
+
+    @Resource(name = "messages")
+    public void setMessages(Map<String, String> messages) {
+        this.messages = messages;
     }
 }

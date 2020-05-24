@@ -14,12 +14,10 @@ import java.util.Map;
 
 @Component
 public class GetYoutubeChannelListCommand extends Command {
-    @Resource(name = "messages")
-    private Map<String, String> messages;
-
     private final YoutubeService youtubeService;
     private final GetChannelListCommandHelper helper;
 
+    private Map<String, String> messages;
 
     public GetYoutubeChannelListCommand(YoutubeService youtubeService,
                                         GetChannelListCommandHelper helper,
@@ -54,5 +52,10 @@ public class GetYoutubeChannelListCommand extends Command {
                 .replaceAll("\\{channel_id}", channel.getChannelId())
                 .replaceAll("\\{mention_role}", roleName)
                 .replaceAll("\\{uploads_playlist_id}", channel.getUploadsPlaylistId());
+    }
+
+    @Resource(name = "messages")
+    public void setMessages(Map<String, String> messages) {
+        this.messages = messages;
     }
 }
