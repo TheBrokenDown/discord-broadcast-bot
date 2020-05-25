@@ -5,7 +5,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import org.springframework.beans.factory.annotation.Autowired;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +32,7 @@ public class ApplicationConfiguration {
             @Value("${discord.message.pattern.twitch.stream}") String twitchStreamMessagePattern,
             @Value("${discord.message.pattern.mixer.stream}") String mixerStreamMessagePattern,
             @Value("${discord.channel.id}") String messageChannelId,
-            @Autowired JDA jda) {
+            JDA jda) {
         return new DiscordManagerImpl(youtubeVideoMessagePattern, twitchStreamMessagePattern, mixerStreamMessagePattern,
                 messageChannelId, jda);
     }
@@ -67,7 +67,8 @@ public class ApplicationConfiguration {
     @Bean
     @SneakyThrows
     JDA getJda(@Value("${discord.bot.token}") String botToken) {
-        return new JDABuilder(botToken)
+        return JDABuilder.createDefault(botToken)
+                .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MESSAGE_REACTIONS)
                 .build();
     }
 
