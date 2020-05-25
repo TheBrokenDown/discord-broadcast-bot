@@ -41,8 +41,10 @@ public class ApplicationConfiguration {
     YoutubeIntegration getYoutubeVideoRepository(
             @Value("${youtube.api.token}") String apiToken,
             @Value("${youtube.api.videos.from.playlist.url}") String videosFromPlaylistUrl,
+            @Value("${youtube.api.video.by.id.url}") String videoByIdUrl,
+            @Value("${youtube.api.channel.info.by.id.url}") String channelInfoByIdUrl,
             Gson gson) {
-        return new YoutubeIntegrationImpl(videosFromPlaylistUrl, apiToken, gson);
+        return new YoutubeIntegrationImpl(videosFromPlaylistUrl, channelInfoByIdUrl, videoByIdUrl, apiToken, gson);
     }
 
     @Bean

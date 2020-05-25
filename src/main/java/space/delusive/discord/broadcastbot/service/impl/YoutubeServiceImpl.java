@@ -7,7 +7,11 @@ import org.springframework.stereotype.Component;
 import space.delusive.discord.broadcastbot.discord.DiscordManager;
 import space.delusive.discord.broadcastbot.domain.YoutubeChannel;
 import space.delusive.discord.broadcastbot.domain.YoutubeVideo;
+import space.delusive.discord.broadcastbot.exception.ChannelNotFoundException;
+import space.delusive.discord.broadcastbot.exception.YoutubeVideoNotFoundException;
 import space.delusive.discord.broadcastbot.integration.YoutubeIntegration;
+import space.delusive.discord.broadcastbot.integration.dto.YoutubeChannelInfoDto;
+import space.delusive.discord.broadcastbot.integration.dto.YoutubeVideoDto;
 import space.delusive.discord.broadcastbot.repository.YoutubeChannelRepository;
 import space.delusive.discord.broadcastbot.repository.YoutubeVideoRepository;
 import space.delusive.discord.broadcastbot.service.YoutubeService;
@@ -48,5 +52,36 @@ public class YoutubeServiceImpl implements YoutubeService, Runnable {
     @Override
     public List<YoutubeChannel> getAllChannels() {
         return youtubeChannelRepository.findAll();
+    }
+
+    @Override
+    public YoutubeChannel getYoutubeChannelInfoByVideoId(String videoId)
+            throws YoutubeVideoNotFoundException, ChannelNotFoundException {
+        YoutubeVideoDto videoDto = youtubeIntegration.getVideoById(videoId);
+        if (videoDto.getItems().isEmpty()) {
+            throw new YoutubeVideoNotFoundException();
+        }
+        val snippet = videoDto.getItems().get(0).getSnippet();
+        YoutubeChannelInfoDto channelInfo = youtubeIntegration.getChannelInfoById(snippet.getChannelId());
+        if (channelInfo.getItems().isEmpty()) {
+            throw new ChannelNotFoundException();
+        }
+        String uploadsPlaylistId = channelInfo.getItems().get(0).getContentDetails().getRelatedPlaylists().getUploads();
+        YoutubeChannel youtubeChannel = new YoutubeChannel();
+        youtubeChannel.setChannelName(snippet.getChannelTitle());
+        youtubeChannel.setChannelId(snippet.getChannelId());
+        youtubeChannel.setUploadsPlaylistId(uploadsPlaylistId);
+        // mention role id field is empty, it will be filled in in another place
+        return youtubeChannel;
+    }
+
+    @Override
+    public Optional<YoutubeChannel> getChannelByName(String channelName) {
+        return youtubeChannelRepository.getByChannelName(channelName);
+    }
+
+    @Override
+    public void addChannel(YoutubeChannel youtubeChannel) {
+        youtubeChannelRepository.save(youtubeChannel);
     }
 }
