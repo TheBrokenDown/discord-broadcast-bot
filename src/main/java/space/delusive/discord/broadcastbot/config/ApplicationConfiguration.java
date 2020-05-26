@@ -88,6 +88,7 @@ public class ApplicationConfiguration {
     PropertiesFactoryBean messages(@Value("${localization.file.name}") String fileName) {
         PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();
         propertiesFactoryBean.setLocation(new ClassPathResource(fileName));
+        propertiesFactoryBean.setFileEncoding("UTF-8");
         return propertiesFactoryBean;
     }
 }
