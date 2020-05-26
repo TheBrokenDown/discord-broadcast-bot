@@ -10,4 +10,8 @@ public interface YoutubeChannelRepository extends CrudRepository<YoutubeChannel,
     List<YoutubeChannel> findAll();
 
     Optional<YoutubeChannel> getByChannelName(String channelName);
+
+    Optional<YoutubeChannel> getByChannelId(String channelId);
+
+    void removeByChannelId(String channelId);
 }

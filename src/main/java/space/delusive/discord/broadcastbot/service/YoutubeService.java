@@ -36,4 +36,19 @@ public interface YoutubeService {
      * @param youtubeChannel target channel
      */
     void addChannel(YoutubeChannel youtubeChannel);
+
+    /**
+     * Get channel from the database by channelId field (not id!)
+     *
+     * @param channelId id of the channel
+     * @return requested channel if it was found, empty optional otherwise
+     */
+    Optional<YoutubeChannel> getChannelByChannelId(String channelId);
+
+    /**
+     * Remove the channel from the database
+     *
+     * @param channelId id of the removable channel
+     */
+    void removeChannelById(String channelId);
 }

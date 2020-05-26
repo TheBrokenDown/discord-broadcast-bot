@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import space.delusive.discord.broadcastbot.discord.DiscordManager;
 import space.delusive.discord.broadcastbot.domain.YoutubeChannel;
 import space.delusive.discord.broadcastbot.domain.YoutubeVideo;
@@ -83,5 +84,16 @@ public class YoutubeServiceImpl implements YoutubeService, Runnable {
     @Override
     public void addChannel(YoutubeChannel youtubeChannel) {
         youtubeChannelRepository.save(youtubeChannel);
+    }
+
+    @Override
+    public Optional<YoutubeChannel> getChannelByChannelId(String channelId) {
+        return youtubeChannelRepository.getByChannelId(channelId);
+    }
+
+    @Override
+    @Transactional
+    public void removeChannelById(String channelId) {
+        youtubeChannelRepository.removeByChannelId(channelId);
     }
 }
