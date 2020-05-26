@@ -111,10 +111,16 @@ public class AddYoutubeChannelCommand extends Command {
                             CommandUtils.getSameAuthorSameChannelDifferentMessagesPredicate(commandEvent),
                             getMentionRoleReceivedConsumer(commandEvent, youtubeChannel),
                             1, TimeUnit.MINUTES, timeoutAction);
+                    reactionEvent.getChannel().deleteMessageById(confirmationMessageId).complete();
                 }
-                case INCORRECT_CHANNEL_FOUND_REACTION ->
-                        commandEvent.reply(messages.get("add.youtube.channel.confirm.invalid"));
-                default -> waitForReactionEvent(youtubeChannel, confirmationMessageId, commandEvent); // wait for required reaction!
+                case INCORRECT_CHANNEL_FOUND_REACTION -> {
+                    commandEvent.reply(messages.get("add.youtube.channel.confirm.invalid"));
+                    reactionEvent.getChannel().deleteMessageById(confirmationMessageId).complete();
+                }
+                default -> {
+                    reactionEvent.getReaction().removeReaction(reactionEvent.getUser()).queue();
+                    waitForReactionEvent(youtubeChannel, confirmationMessageId, commandEvent); // wait for required reaction!
+                }
             }
         };
     }
