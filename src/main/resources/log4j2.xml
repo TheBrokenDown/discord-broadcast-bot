@@ -1,28 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Configuration status="INFO">
-  <Properties>
-    <property name="console_pattern">%d [%p] %c{1} – %m%n</property>
-    <property name="file_pattern">%sn %d{yyyy-MM-dd HH:mm:ss,SSS} %r [%-6p] [%t] %c{3} %C{3}.%M(%F:%L) – %m%n</property>
-    <property name="logs_folder">logs</property>
-  </Properties>
+    <Properties>
+        <property name="console_pattern">%d [%p] %c{1} – %m%n</property>
+        <property name="file_pattern">%sn %d{yyyy-MM-dd HH:mm:ss,SSS} %r [%-6p] [%t] %c{3} %C{3}.%M(%F:%L) – %m%n
+        </property>
+        <property name="logs_folder">logs</property>
+    </Properties>
 
-  <Appenders>
-    <Console name="console" target="SYSTEM_OUT">
-      <PatternLayout pattern="${console_pattern}"/>
-    </Console>
-    <File name="file1" fileName="${logs_folder}/application.log">
-      <PatternLayout pattern="${file_pattern}"/>
-    </File>
-  </Appenders>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${console_pattern}"/>
+        </Console>
+        <RollingFile name="common" fileName="${logs_folder}/application.log"
+                     filePattern="${logs_folder}/$${date:yyyy-MM}/application-%d{dd-MM-yyyy}-%i.log.gz" ignoreExceptions="false">
+            <PatternLayout pattern="${file_pattern}"/>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${logs_folder}" maxDepth="2">
+                    <IfFileName glob="*/application*.log.gz"/>
+                    <IfLastModified age="60d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+        </RollingFile>
+        <RollingFile name="integration" fileName="${logs_folder}/integration.log"
+                     filePattern="${logs_folder}/$${date:yyyy-MM}/integration-%d{dd-MM-yyyy}-%i.log.gz" ignoreExceptions="false">
+            <PatternLayout pattern="${file_pattern}"/>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${logs_folder}" maxDepth="2">
+                    <IfFileName glob="*/integration*.log.gz"/>
+                    <IfLastModified age="60d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
 
-  <Loggers>
-    <Root level="debug">
-      <Appender-ref ref="console" level="info"/>
-      <Appender-ref ref="file1" level="debug"/>
-    </Root>
-    <Logger name="org.springframework" level="debug">
-      <Appender-ref ref="console" level="info"/>
-      <Appender-ref ref="file1" level="debug"/>
-    </Logger>
-  </Loggers>
+    <Loggers>
+        <Root level="debug">
+            <Appender-ref ref="console" level="info"/>
+            <Appender-ref ref="common" level="info"/>
+        </Root>
+        <Logger name="org.springframework" level="info">
+            <Appender-ref ref="console" level="info"/>
+            <Appender-ref ref="common" level="info"/>
+        </Logger>
+        <Logger name="space.delusive.discord.broadcastbot.integration" level="debug">
+            <Appender-ref ref="integration" level="debug"/>
+        </Logger>
+    </Loggers>
 </Configuration>

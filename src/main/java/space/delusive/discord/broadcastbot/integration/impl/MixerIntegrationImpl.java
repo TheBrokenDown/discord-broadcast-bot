@@ -5,6 +5,7 @@ import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.json.JSONObject;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import lombok.val;
 import space.delusive.discord.broadcastbot.exception.ChannelNotFoundException;
 import space.delusive.discord.broadcastbot.exception.NoCurrentStreamFoundException;
@@ -12,6 +13,7 @@ import space.delusive.discord.broadcastbot.exception.UnsuccessfulRequestExceptio
 import space.delusive.discord.broadcastbot.integration.MixerIntegration;
 import space.delusive.discord.broadcastbot.integration.dto.MixerStreamDto;
 
+@Log4j2
 @AllArgsConstructor
 public class MixerIntegrationImpl implements MixerIntegration {
     private static final int HTTP_NOT_FOUND = 404;
@@ -24,6 +26,8 @@ public class MixerIntegrationImpl implements MixerIntegration {
         HttpResponse<JsonNode> response = Unirest.get(lastStreamUrl)
                 .routeParam("channelId", channelId)
                 .asJson();
+        log.debug("Request to get current stream on Mixer channel with id \"{}\" has been sent. Following answer has been received. Status: \"{}\", Body: \"{}\"",
+                channelId, response.getStatusText(), response.getBody().toString());
         checkResponseOfGettingCurrentStream(response);
         val jsonObject = response.getBody().getObject();
         return extractDtoFromJsonObject(jsonObject);
@@ -34,6 +38,8 @@ public class MixerIntegrationImpl implements MixerIntegration {
         HttpResponse<JsonNode> response = Unirest.get(channelInfoByNameUrl)
                 .routeParam("channelName", channelName)
                 .asJson();
+        log.debug("Request to get channel id by name \"{}\" on Mixer has been sent. Following answer has been received. Status: \"{}\", Body: \"{}\"",
+                channelName, response.getStatusText(), response.getBody().toString());
         checkResponseOfGettingChannelId(response);
         return String.valueOf(response.getBody().getObject().getInt("id"));
     }

@@ -7,6 +7,7 @@ import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import lombok.extern.log4j.Log4j2;
 import lombok.val;
 import org.springframework.util.StringUtils;
 import space.delusive.discord.broadcastbot.exception.NoCurrentStreamFoundException;
@@ -16,6 +17,7 @@ import space.delusive.discord.broadcastbot.integration.dto.TwitchStreamDto;
 
 import java.time.LocalDateTime;
 
+@Log4j2
 @RequiredArgsConstructor
 public class TwitchIntegrationImpl implements TwitchIntegration {
     private final String getCurrentStreamUrl;
@@ -33,6 +35,8 @@ public class TwitchIntegrationImpl implements TwitchIntegration {
                 .header("Client-ID", clientId)
                 .header("Authorization", StringUtils.capitalize(oauthToken.getTokenType()) + " " + oauthToken.getAccessToken())
                 .asJson();
+        log.debug("Request to get current stream on Twitch channel with name \"{}\" has been sent. Following answer has been received. Status: \"{}\", Body: \"{}\"",
+                userName, response.getStatusText(), response.getBody().toString());
         checkForSuccess(response);
         JSONArray data = response.getBody().getObject().getJSONArray("data");
         if (data.isEmpty()) throw new NoCurrentStreamFoundException();
@@ -56,6 +60,8 @@ public class TwitchIntegrationImpl implements TwitchIntegration {
                 .routeParam("clientId", clientId)
                 .routeParam("clientSecret", clientSecret)
                 .asJson();
+        log.debug("Request to get new OAuth token on Twitch has been sent. Following answer has been received. Status: \"{}\", Body: \"{}\"",
+                response.getStatusText(), response.getBody().toPrettyString());
         checkForSuccess(response);
         JSONObject jsonObject = response.getBody().getObject();
         val accessToken = jsonObject.getString("access_token");

@@ -26,6 +26,8 @@ public class YoutubeIntegrationImpl implements YoutubeIntegration {
                 .routeParam("channelId", channelId)
                 .routeParam("apiToken", apiToken)
                 .asJson();
+        log.debug("Request to get last uploaded video on YouTube channel with id \"{}\" has been sent. Following answer has been received. Status: \"{}\" Body: \"{}\"",
+                channelId, response.getStatusText(), response.getBody().toString());
         checkResponseForSuccess(response);
         val jsonObject = (JSONObject) response.getBody().getObject().getJSONArray("items").get(0); // TODO: 12/22/2019 review case if there is no videos available
         return extractVideoDtoFromJsonObjectByChannelId(jsonObject);
@@ -37,6 +39,8 @@ public class YoutubeIntegrationImpl implements YoutubeIntegration {
                 .routeParam("playlistId", playlistId)
                 .routeParam("apiToken", apiToken)
                 .asJson();
+        log.debug("Request to get last uploaded video on YouTube by playlist id \"{}\" has been sent. Following answer has been received. Status: \"{}\" Body: \"{}\"",
+                playlistId, response.getStatusText(), response.getBody().toString());
         checkResponseForSuccess(response);
         val jsonObject = (JSONObject) response.getBody().getObject().getJSONArray("items").get(0); // TODO: 12/23/2019 here too :p
         return extractVideoDtoFromJsonObjectByPlaylistId(jsonObject);
